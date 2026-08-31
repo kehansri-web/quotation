@@ -1,0 +1,53 @@
+name: Daily 08:00 PM IST Solar Quotation Report
+
+on:
+  schedule:
+    # 14:30 UTC = 20:00 IST (08:00 PM Indian Standard Time)
+    - cron: '30 14 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  daily-report:
+    name: Generate & Dispatch Daily Excel Report
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Python Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install openpyxl requests
+
+      - name: Run Daily Report Generator & Email Dispatcher
+        env:
+          REPORT_RECIPIENT_EMAIL: ${{ secrets.REPORT_RECIPIENT_EMAIL || 'tarun.dixit@kehansri.com' }}
+          GMAIL_CLIENT_ID: ${{ secrets.GMAIL_CLIENT_ID || '54322630044-vt5qaue05c8bprpbiv0hh3rij6odohpt.apps.googleusercontent.com' }}
+          GMAIL_CLIENT_SECRET: ${{ secrets.GMAIL_CLIENT_SECRET || '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' }}
+          GMAIL_REFRESH_TOKEN: ${{ secrets.GMAIL_REFRESH_TOKEN }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST || 'smtp.gmail.com' }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT || '587' }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL || 'https://bvxyzsmveauqcpbnfgdt.supabase.co' }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ2eHl6c212ZWF1cWNwYm5mZ2R0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgxODgyOTcsImV4cCI6MjEwMzc2NDI5N30.QuKpVpUgMSghV9ZWuB2b6006MV16-G2EHk0-Th3LDjI' }}
+        run: |
+          python scripts/daily_report_mailer.py
+
+      - name: Upload Daily Excel Report as GitHub Artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: daily-solar-excel-reports
+          path: reports/*.xlsx
+          retention-days: 30
