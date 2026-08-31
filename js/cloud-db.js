@@ -308,6 +308,11 @@ class CloudDatabaseEngine {
     const system_type = s.systemType || quote.system_type || "on-grid";
     const created_at = quote.created_at || quote.savedAt || quote.createdAt || new Date().toISOString();
 
+    const fullQuoteObj = typeof quote === 'object' ? { ...quote } : JSON.parse(quote || '{}');
+    if (!fullQuoteObj.solar) fullQuoteObj.solar = {};
+    fullQuoteObj.solar.customerType = customer_type;
+    fullQuoteObj.solar.systemType = system_type;
+
     const record = {
       id: qid,
       quote_number: qnum,
@@ -324,10 +329,8 @@ class CloudDatabaseEngine {
       sales_rep,
       sales_username,
       installer_brand,
-      customer_type,
-      system_type,
       status: "Generated",
-      quote_json: typeof quote === 'string' ? quote : JSON.stringify(quote),
+      quote_json: fullQuoteObj,
       created_at
     };
 
