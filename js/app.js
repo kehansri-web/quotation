@@ -118,6 +118,13 @@ class QuotationApp {
       const initialZoom = initialQuote.solar?.mapZoom || 17;
       this.triggerMapGeneration(initialLoc, initialZoom, false);
     }
+
+    // Auto-sync local quotations to Supabase Cloud Database
+    setTimeout(() => {
+      if (window.cloudDb) {
+        window.cloudDb.syncAllLocalQuotesToCloud();
+      }
+    }, 1000);
   }
 
   // =========================================================================

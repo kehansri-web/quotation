@@ -291,21 +291,22 @@ class CloudDatabaseEngine {
     const s = quote.solar || {};
     const b = quote.business || {};
 
-    const client_name = c.name || "Unnamed Client";
-    const client_phone = c.phone || "";
-    const client_email = c.email || "";
-    const client_addr = c.billingAddress || "";
-    const kw = parseFloat(s.kwCapacity || 5);
-    const brand = String(s.partnerBrand || "adani");
-    const structure = String(s.structureType || "Elevated");
-    const cost = parseFloat(s.customSystemCost || (kw * parseFloat(s.costPerKw || 55000)));
-    const subsidy = (s.customSubsidy !== null && s.customSubsidy !== undefined && String(s.customSubsidy).trim() !== "") ? (parseFloat(s.customSubsidy) || 0) : 0;
+    const client_name = c.name || quote.client_name || quote.clientName || "Unnamed Client";
+    const client_phone = c.phone || quote.client_phone || quote.clientPhone || "";
+    const client_email = c.email || quote.client_email || quote.clientEmail || "";
+    const client_addr = c.billingAddress || quote.client_address || quote.clientAddress || "";
+    const kw = parseFloat(s.kwCapacity || quote.kw_capacity || quote.kwCapacity || 5);
+    const brand = String(s.partnerBrand || quote.partner_brand || quote.partnerBrand || "adani");
+    const structure = String(s.structureType || quote.structure_type || quote.structureType || "Elevated");
+    const cost = parseFloat(s.customSystemCost || quote.total_cost || quote.totalCost || (kw * parseFloat(s.costPerKw || 55000)));
+    const subsidy = (s.customSubsidy !== null && s.customSubsidy !== undefined && String(s.customSubsidy).trim() !== "") ? (parseFloat(s.customSubsidy) || 0) : (parseFloat(quote.subsidy) || 0);
     const net_cost = Math.max(cost - subsidy, 0);
-    const sales_rep = b.preparedByName || b.name || "Sales Rep";
-    const sales_username = b.salesUsername || window.adminAuth?.username || sessionStorage.getItem("quotecraft_auth_user") || "SALES";
-    const installer_brand = b.brandPreset || s.installerBrand || "kehansri";
-    const customer_type = s.customerType || "residential";
-    const system_type = s.systemType || "on-grid";
+    const sales_rep = b.preparedByName || quote.sales_rep || quote.salesRep || b.name || "Sales Rep";
+    const sales_username = b.salesUsername || quote.sales_username || window.adminAuth?.username || sessionStorage.getItem("quotecraft_auth_user") || "SALES";
+    const installer_brand = b.brandPreset || quote.installer_brand || s.installerBrand || "kehansri";
+    const customer_type = s.customerType || quote.customer_type || "residential";
+    const system_type = s.systemType || quote.system_type || "on-grid";
+    const created_at = quote.created_at || quote.savedAt || quote.createdAt || new Date().toISOString();
 
     const record = {
       id: qid,
@@ -326,8 +327,8 @@ class CloudDatabaseEngine {
       customer_type,
       system_type,
       status: "Generated",
-      quote_json: JSON.stringify(quote),
-      created_at: new Date().toISOString()
+      quote_json: typeof quote === 'string' ? quote : JSON.stringify(quote),
+      created_at
     };
 
     // Save locally (User-Scoped Cache)
@@ -340,6 +341,7 @@ class CloudDatabaseEngine {
     }
     try {
       localStorage.setItem(this.getLocalQuotesCacheKey(), JSON.stringify(localQuotes));
+      localStorage.setItem("quotecraft_cloud_quotes_cache", JSON.stringify(localQuotes));
     } catch (e) {}
 
     // 1. Try Supabase Cloud Database
@@ -354,10 +356,13 @@ class CloudDatabaseEngine {
           body: JSON.stringify(record)
         });
         if (resp.ok) {
+          console.log(`✓ Quote ${qnum} synced to Supabase Cloud DB`);
           return { success: true, id: qid, syncedTo: "cloud" };
+        } else {
+          console.warn(`Supabase save error HTTP ${resp.status}:`, await resp.text());
         }
       } catch (e) {
-        console.warn("Cloud DB sync failed, cached locally.");
+        console.warn("Cloud DB sync failed, cached locally:", e);
       }
     }
 
@@ -368,19 +373,70 @@ class CloudDatabaseEngine {
       if (authToken) {
         headers["Authorization"] = `Bearer ${authToken}`;
       }
-      const resp = await fetch(this.getApiBase() + "/api/quotes", {
+      const resp = await fetch(`${this.getApiBase()}/api/quotes`, {
         method: "POST",
         headers,
-        body: JSON.stringify({ quote })
+        body: JSON.stringify(record)
       });
       if (resp.ok) {
         return await resp.json();
       }
-    } catch (e) {
-      console.warn("Server DB sync error:", e);
-    }
+    } catch (e) {}
 
     return { success: true, id: qid, syncedTo: "local" };
+  }
+
+  /**
+   * Scans all local browser storage and syncs any offline/unsynced proposals to Supabase
+   */
+  async syncAllLocalQuotesToCloud() {
+    if (!this.isCloudConfigured()) return { success: false, message: "Cloud not configured" };
+
+    let totalSynced = 0;
+    const syncedIds = new Set();
+
+    // 1. Gather all local quotes across all keys in localStorage
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && (key.startsWith("quotecraft_quote_history") || key.startsWith("quotecraft_cloud_quotes_cache") || key === "quotecraft_quotes_local")) {
+        try {
+          const raw = localStorage.getItem(key);
+          const list = JSON.parse(raw);
+          if (Array.isArray(list)) {
+            for (const q of list) {
+              const qid = q?.id || q?.quoteNumber || q?.quote_number;
+              if (qid && !syncedIds.has(qid)) {
+                syncedIds.add(qid);
+                const res = await this.saveQuote(q);
+                if (res && res.success) {
+                  totalSynced++;
+                }
+              }
+            }
+          }
+        } catch (e) {}
+      }
+    }
+
+    // 2. Also check state history if state is defined
+    if (typeof state !== "undefined" && typeof state.getHistory === "function") {
+      const history = state.getHistory();
+      if (Array.isArray(history)) {
+        for (const q of history) {
+          const qid = q?.id || q?.quoteNumber || q?.quote_number;
+          if (qid && !syncedIds.has(qid)) {
+            syncedIds.add(qid);
+            const res = await this.saveQuote(q);
+            if (res && res.success) {
+              totalSynced++;
+            }
+          }
+        }
+      }
+    }
+
+    console.log(`☁️ Cloud Sync complete: ${totalSynced} quotes synced to Supabase.`);
+    return { success: true, count: totalSynced };
   }
 
   /**

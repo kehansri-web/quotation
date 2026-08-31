@@ -1059,6 +1059,12 @@ create policy "Allow all access to users" on users for all using (true) with che
     }
 
     try {
+      if (window.cloudDb) {
+        await window.cloudDb.syncAllLocalQuotesToCloud();
+      }
+    } catch (e) {}
+
+    try {
       await this.fetchMasterSalesReps();
     } catch (e) {
       console.warn("fetchMasterSalesReps error:", e);
@@ -1080,6 +1086,35 @@ create policy "Allow all access to users" on users for all using (true) with che
       await this.loadAdminStats();
     } catch (e) {
       console.warn("loadAdminStats error:", e);
+    }
+  }
+
+  async syncLocalQuotesToCloud() {
+    const btn = document.getElementById("btn-admin-sync-cloud");
+    const origHtml = btn ? btn.innerHTML : "";
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = "<span>⏳ Syncing to Cloud...</span>";
+    }
+    try {
+      if (window.cloudDb) {
+        const res = await window.cloudDb.syncAllLocalQuotesToCloud();
+        if (typeof app !== "undefined" && typeof app.showToast === "function") {
+          app.showToast(`☁️ Cloud Sync: Successfully synced ${res.count || 0} quote(s) to Supabase!`, "success");
+        }
+        await this.loadAdminQuotesTable();
+        await this.loadAdminStats();
+      }
+    } catch (e) {
+      console.error("Cloud sync error:", e);
+      if (typeof app !== "undefined" && typeof app.showToast === "function") {
+        app.showToast("Cloud sync failed. Check internet connection.", "error");
+      }
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = origHtml;
+      }
     }
   }
 
