@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 220" width="240" height="220">
+  <!-- Dots on top of K -->
+  <circle cx="90" cy="30" r="7" fill="#008852" />
+  <circle cx="110" cy="22" r="6" fill="#008852" />
+  <circle cx="130" cy="18" r="5" fill="#f58220" />
+  <!-- Stylized K -->
+  <path d="M 85 45 L 85 140 L 105 140 L 105 105 L 140 140 L 168 140 L 122 95 L 162 45 L 135 45 L 105 85 L 105 45 Z" fill="#008852" />
+  <!-- ENERGY SOLUTIONS text -->
+  <text x="120" y="170" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif" font-weight="900" font-size="24" fill="#008852" letter-spacing="4">ENERGY</text>
+  <text x="120" y="195" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif" font-weight="800" font-size="18" fill="#f58220" letter-spacing="5">SOLUTIONS</text>
+</svg>

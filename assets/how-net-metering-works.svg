@@ -1,0 +1,237 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 950 500" width="100%" height="auto">
+  <defs>
+    <!-- Sun Gradient -->
+    <radialGradient id="sunCore" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#fffbeb" />
+      <stop offset="35%" stop-color="#fef08a" />
+      <stop offset="70%" stop-color="#f59e0b" />
+      <stop offset="100%" stop-color="#d97706" />
+    </radialGradient>
+
+    <!-- Solar PV Cells Grid -->
+    <pattern id="pvGrid" width="16" height="24" patternUnits="userSpaceOnUse" patternTransform="rotate(25)">
+      <rect width="15" height="23" fill="#1d4ed8" stroke="#60a5fa" stroke-width="1"/>
+      <line x1="7.5" y1="0" x2="7.5" y2="23" stroke="#93c5fd" stroke-width="0.8"/>
+    </pattern>
+
+    <!-- Glass Meter Gradient -->
+    <radialGradient id="meterGlass" cx="35%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.9" />
+      <stop offset="50%" stop-color="#e2e8f0" stop-opacity="0.4" />
+      <stop offset="100%" stop-color="#94a3b8" stop-opacity="0.8" />
+    </radialGradient>
+  </defs>
+
+  <!-- Background Clean White Box -->
+  <rect width="950" height="500" fill="#ffffff" rx="8" />
+
+  <!-- Top Title & Subtitle -->
+  <text x="700" y="55" text-anchor="middle" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-weight="900" font-size="34" fill="#3b82f6" letter-spacing="-0.5">How Net Metering Works</text>
+  <text x="700" y="85" text-anchor="middle" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-weight="700" font-size="20" fill="#475569">Photovoltaic Solar Example</text>
+
+  <!-- =========================================================================
+       1. THE SUN & SOLAR PANELS
+       ========================================================================= -->
+  <!-- Shining Sun -->
+  <g transform="translate(180, 95)">
+    <!-- Sun Outer Rays -->
+    <g stroke="#f59e0b" stroke-width="4" stroke-linecap="round">
+      <line x1="0" y1="-55" x2="0" y2="-72"/>
+      <line x1="0" y1="55" x2="0" y2="72"/>
+      <line x1="-55" y1="0" x2="-72" y2="0"/>
+      <line x1="55" y1="0" x2="72" y2="0"/>
+      <line x1="-39" y1="-39" x2="-51" y2="-51"/>
+      <line x1="39" y1="39" x2="51" y2="51"/>
+      <line x1="-39" y1="39" x2="-51" y2="51"/>
+      <line x1="39" y1="-39" x2="51" y2="-51"/>
+      <line x1="-22" y1="-50" x2="-28" y2="-65"/>
+      <line x1="22" y1="50" x2="28" y2="65"/>
+      <line x1="-50" y1="-22" x2="-65" y2="-28"/>
+      <line x1="50" y1="22" x2="65" y2="28"/>
+      <line x1="-50" y1="22" x2="-65" y2="28"/>
+      <line x1="50" y1="-22" x2="65" y2="-28"/>
+      <line x1="-22" y1="50" x2="-28" y2="65"/>
+      <line x1="22" y1="-50" x2="28" y2="-65"/>
+    </g>
+    <!-- Sun Glowing Disk -->
+    <circle cx="0" cy="0" r="46" fill="url(#sunCore)" stroke="#f59e0b" stroke-width="2"/>
+  </g>
+
+  <!-- Solar PV Panel Array (Tilted towards sun) -->
+  <g transform="translate(210, 115)">
+    <!-- Aluminum Frame -->
+    <polygon points="50,0 120,40 60,195 -10,155" fill="#e2e8f0" stroke="#64748b" stroke-width="3"/>
+    <!-- Blue PV Modules Face -->
+    <polygon points="52,4 116,40 58,190 -6,154" fill="url(#pvGrid)"/>
+  </g>
+
+  <!-- Step 1 Text Block -->
+  <g transform="translate(35, 130)">
+    <circle cx="20" cy="20" r="18" fill="#3b82f6"/>
+    <text x="20" y="27" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif" font-weight="900" font-size="18" fill="#ffffff">1</text>
+    <text x="48" y="18" font-family="'Plus Jakarta Sans', sans-serif" font-weight="800" font-size="15" fill="#1e293b">Solar panels</text>
+    <text x="48" y="38" font-family="'Plus Jakarta Sans', sans-serif" font-weight="700" font-size="13.5" fill="#334155">convert energy</text>
+    <text x="48" y="56" font-family="'Plus Jakarta Sans', sans-serif" font-weight="700" font-size="13.5" fill="#334155">from the sun</text>
+    <text x="48" y="74" font-family="'Plus Jakarta Sans', sans-serif" font-weight="700" font-size="13.5" fill="#334155">into electricity</text>
+  </g>
+
+  <!-- =========================================================================
+       2. INVERTER (DC to AC)
+       ========================================================================= -->
+  <!-- Blue Curved Arrow from Solar to Inverter -->
+  <path d="M 235 240 Q 255 310 270 330" fill="none" stroke="#3b82f6" stroke-width="8" stroke-linecap="round"/>
+  <polygon points="262,342 278,335 272,320" fill="#3b82f6"/>
+
+  <!-- Inverter Box -->
+  <g transform="translate(155, 270)">
+    <rect width="64" height="42" rx="4" fill="#64748b" stroke="#475569" stroke-width="2"/>
+    <circle cx="16" cy="21" r="5" fill="#22c55e"/>
+    <line x1="30" y1="18" x2="52" y2="18" stroke="#e2e8f0" stroke-width="2"/>
+    <line x1="30" y1="24" x2="48" y2="24" stroke="#e2e8f0" stroke-width="2"/>
+  </g>
+
+  <!-- Step 2 Text Block -->
+  <g transform="translate(20, 350)">
+    <circle cx="20" cy="20" r="18" fill="#3b82f6"/>
+    <text x="20" y="27" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif" font-weight="900" font-size="18" fill="#ffffff">2</text>
+    <text x="48" y="16" font-family="'Plus Jakarta Sans', sans-serif" font-weight="800" font-size="14.5" fill="#1e293b">An inverter converts the</text>
+    <text x="48" y="35" font-family="'Plus Jakarta Sans', sans-serif" font-weight="700" font-size="13.5" fill="#334155">electricity produced by the</text>
+    <text x="48" y="53" font-family="'Plus Jakarta Sans', sans-serif" font-weight="700" font-size="13.5" fill="#334155">solar panels from direct</text>
+    <text x="48" y="71" font-family="'Plus Jakarta Sans', sans-serif" font-weight="700" font-size="13.5" fill="#334155">current (DC) to alternating</text>
+    <text x="48" y="89" font-family="'Plus Jakarta Sans', sans-serif" font-weight="700" font-size="13.5" fill="#334155">current (AC) for use in your</text>
+    <text x="48" y="107" font-family="'Plus Jakarta Sans', sans-serif" font-weight="700" font-size="13.5" fill="#334155">home, school or business</text>
+  </g>
+
+  <!-- =========================================================================
+       3. HOME CONSUMPTION
+       ========================================================================= -->
+  <!-- 2-Story Yellow House with Red Roof -->
+  <g transform="translate(300, 230)">
+    <!-- House Main Body -->
+    <polygon points="50,20 150,0 210,35 110,55" fill="#ca8a04"/> <!-- Top Gable edge -->
+    <polygon points="50,20 110,55 110,195 50,160" fill="#fef08a" stroke="#ca8a04" stroke-width="2"/> <!-- Left wall -->
+    <polygon points="110,55 210,35 210,175 110,195" fill="#fde047" stroke="#ca8a04" stroke-width="2"/> <!-- Front wall -->
+    
+    <!-- Red Slanted Roof -->
+    <polygon points="40,20 150,-10 220,30 110,60" fill="#dc2626" stroke="#991b1b" stroke-width="2"/>
+    
+    <!-- Windows Left Wall -->
+    <polygon points="62,60 88,72 88,96 62,84" fill="#bae6fd" stroke="#0284c7" stroke-width="1.5"/>
+    <polygon points="62,110 88,122 88,146 62,134" fill="#bae6fd" stroke="#0284c7" stroke-width="1.5"/>
+    
+    <!-- Windows Front Wall -->
+    <polygon points="130,75 160,70 160,95 130,100" fill="#bae6fd" stroke="#0284c7" stroke-width="1.5"/>
+    <polygon points="175,67 200,62 200,87 175,92" fill="#bae6fd" stroke="#0284c7" stroke-width="1.5"/>
+    <polygon points="130,125 160,120 160,145 130,150" fill="#bae6fd" stroke="#0284c7" stroke-width="1.5"/>
+    
+    <!-- Front Door -->
+    <polygon points="172,120 198,115 198,177 172,182" fill="#b45309" stroke="#78350f" stroke-width="1.5"/>
+    <polygon points="160,180 196,173 205,190 169,197" fill="#cbd5e1"/> <!-- Doorstep -->
+  </g>
+
+  <!-- Step 3 Text Block -->
+  <g transform="translate(345, 130)">
+    <circle cx="20" cy="20" r="18" fill="#3b82f6"/>
+    <text x="20" y="27" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif" font-weight="900" font-size="18" fill="#ffffff">3</text>
+    <text x="48" y="18" font-family="'Plus Jakarta Sans', sans-serif" font-weight="800" font-size="15" fill="#1e293b">The energy is</text>
+    <text x="48" y="38" font-family="'Plus Jakarta Sans', sans-serif" font-weight="700" font-size="13.5" fill="#334155">used in your</text>
+    <text x="48" y="56" font-family="'Plus Jakarta Sans', sans-serif" font-weight="700" font-size="13.5" fill="#334155">home, school</text>
+    <text x="48" y="74" font-family="'Plus Jakarta Sans', sans-serif" font-weight="700" font-size="13.5" fill="#334155">or business</text>
+  </g>
+
+  <!-- =========================================================================
+       4. BI-DIRECTIONAL NET METER & ELECTRICAL GRID
+       ========================================================================= -->
+  <!-- Text Note 1: Energy used in home from electrical grid -->
+  <text x="560" y="210" font-family="'Plus Jakarta Sans', sans-serif" font-style="italic" font-weight="600" font-size="12.5" fill="#475569">Energy used in</text>
+  <text x="560" y="226" font-family="'Plus Jakarta Sans', sans-serif" font-style="italic" font-weight="600" font-size="12.5" fill="#475569">your home from</text>
+  <text x="560" y="242" font-family="'Plus Jakarta Sans', sans-serif" font-style="italic" font-weight="600" font-size="12.5" fill="#475569">the electrical grid</text>
+  <line x1="585" y1="250" x2="585" y2="280" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3,3"/>
+
+  <!-- Grey Arrow Left (Grid to House) -->
+  <path d="M 640 285 Q 580 270 520 295" fill="none" stroke="#64748b" stroke-width="8" stroke-linecap="round"/>
+  <polygon points="515,295 530,285 530,305" fill="#64748b"/>
+
+  <!-- Blue Arrow Left (Solar Export / Bi-directional) -->
+  <path d="M 520 335 Q 580 360 640 335" fill="none" stroke="#3b82f6" stroke-width="8" stroke-linecap="round"/>
+  <polygon points="515,335 530,325 530,345" fill="#3b82f6"/>
+
+  <!-- Large Bi-Directional Electric Meter Face -->
+  <g transform="translate(680, 315)">
+    <!-- Outer Metal Casing -->
+    <circle cx="0" cy="0" r="62" fill="#e2e8f0" stroke="#475569" stroke-width="6"/>
+    <circle cx="0" cy="0" r="54" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
+    
+    <!-- Meter Dial Display -->
+    <g transform="translate(-36, -20)">
+      <circle cx="10" cy="0" r="8" fill="none" stroke="#334155" stroke-width="1.5"/>
+      <line x1="10" y1="0" x2="15" y2="-4" stroke="#0f172a" stroke-width="2"/>
+      
+      <circle cx="28" cy="0" r="8" fill="none" stroke="#334155" stroke-width="1.5"/>
+      <line x1="28" y1="0" x2="33" y2="4" stroke="#0f172a" stroke-width="2"/>
+
+      <circle cx="46" cy="0" r="8" fill="none" stroke="#334155" stroke-width="1.5"/>
+      <line x1="46" y1="0" x2="42" y2="-5" stroke="#0f172a" stroke-width="2"/>
+
+      <circle cx="64" cy="0" r="8" fill="none" stroke="#334155" stroke-width="1.5"/>
+      <line x1="64" y1="0" x2="68" y2="3" stroke="#0f172a" stroke-width="2"/>
+    </g>
+
+    <!-- Digital Text Bar -->
+    <rect x="-35" y="5" width="70" height="20" rx="3" fill="#f1f5f9" stroke="#cbd5e1"/>
+    <text x="0" y="19" text-anchor="middle" font-family="'Fira Code', monospace" font-size="10" font-weight="700" fill="#0f172a">KILOWATTHOURS</text>
+    
+    <text x="0" y="38" text-anchor="middle" font-family="sans-serif" font-size="7.5" font-weight="600" fill="#64748b">CL200 240V 3W</text>
+    <text x="0" y="47" text-anchor="middle" font-family="sans-serif" font-size="7.5" font-weight="600" fill="#64748b">FM2S 15 30 60Hz</text>
+
+    <!-- Glass Reflection -->
+    <circle cx="0" cy="0" r="54" fill="url(#meterGlass)" pointer-events="none"/>
+  </g>
+
+  <!-- Arrows between Meter & Grid Poles -->
+  <!-- Grey Arrow Right (House to Grid) -->
+  <path d="M 725 285 Q 770 260 805 235" fill="none" stroke="#64748b" stroke-width="8" stroke-linecap="round"/>
+  <polygon points="812,230 796,230 802,245" fill="#64748b"/>
+
+  <!-- Blue Arrow Up-Right (Excess Solar Export) -->
+  <path d="M 750 310 Q 795 285 825 250" fill="none" stroke="#3b82f6" stroke-width="8" stroke-linecap="round"/>
+  <polygon points="832,242 816,245 824,258" fill="#3b82f6"/>
+
+  <!-- Text Note 2: Excess Energy to Grid -->
+  <text x="815" y="325" font-family="'Plus Jakarta Sans', sans-serif" font-style="italic" font-weight="600" font-size="12" fill="#475569">Excess energy</text>
+  <text x="815" y="340" font-family="'Plus Jakarta Sans', sans-serif" font-style="italic" font-weight="600" font-size="12" fill="#475569">from your solar</text>
+  <text x="815" y="355" font-family="'Plus Jakarta Sans', sans-serif" font-style="italic" font-weight="600" font-size="12" fill="#475569">panels not used</text>
+  <text x="815" y="370" font-family="'Plus Jakarta Sans', sans-serif" font-style="italic" font-weight="600" font-size="12" fill="#475569">in your home</text>
+  <text x="815" y="385" font-family="'Plus Jakarta Sans', sans-serif" font-style="italic" font-weight="600" font-size="12" fill="#475569">goes back to the</text>
+  <text x="815" y="400" font-family="'Plus Jakarta Sans', sans-serif" font-style="italic" font-weight="600" font-size="12" fill="#475569">electrical grid</text>
+
+  <!-- Electrical Power Utility Poles -->
+  <g transform="translate(895, 175)">
+    <!-- Wooden / Steel Pole -->
+    <line x1="0" y1="0" x2="0" y2="230" stroke="#1e293b" stroke-width="8" stroke-linecap="round"/>
+    <!-- Crossbars -->
+    <line x1="-40" y1="15" x2="40" y2="15" stroke="#1e293b" stroke-width="6" stroke-linecap="round"/>
+    <line x1="-30" y1="50" x2="30" y2="50" stroke="#1e293b" stroke-width="5" stroke-linecap="round"/>
+    
+    <!-- Insulator Pins -->
+    <circle cx="-35" cy="15" r="4.5" fill="#64748b"/>
+    <circle cx="0" cy="15" r="4.5" fill="#64748b"/>
+    <circle cx="35" cy="15" r="4.5" fill="#64748b"/>
+    <circle cx="-25" cy="50" r="4" fill="#64748b"/>
+    <circle cx="25" cy="50" r="4" fill="#64748b"/>
+
+    <!-- Diagonal Struts -->
+    <line x1="0" y1="35" x2="-30" y2="15" stroke="#334155" stroke-width="3"/>
+    <line x1="0" y1="35" x2="30" y2="15" stroke="#334155" stroke-width="3"/>
+  </g>
+
+  <!-- Step 4 Text Block -->
+  <g transform="translate(550, 400)">
+    <circle cx="20" cy="20" r="18" fill="#3b82f6"/>
+    <text x="20" y="27" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif" font-weight="900" font-size="18" fill="#ffffff">4</text>
+    <text x="48" y="18" font-family="'Plus Jakarta Sans', sans-serif" font-weight="800" font-size="15" fill="#1e293b">A bi-directional meter</text>
+    <text x="48" y="38" font-family="'Plus Jakarta Sans', sans-serif" font-weight="700" font-size="13.5" fill="#334155">measures energy used</text>
+    <text x="48" y="56" font-family="'Plus Jakarta Sans', sans-serif" font-weight="700" font-size="13.5" fill="#334155">and excess energy</text>
+    <text x="48" y="74" font-family="'Plus Jakarta Sans', sans-serif" font-weight="700" font-size="13.5" fill="#334155">produced</text>
+  </g>
+</svg>

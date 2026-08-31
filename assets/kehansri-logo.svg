@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 220" width="500" height="220">
+  <defs>
+    <linearGradient id="ksGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0284c7" />
+      <stop offset="100%" stop-color="#008852" />
+    </linearGradient>
+  </defs>
+  <!-- Solar Icon -->
+  <g transform="translate(65, 85)">
+    <circle cx="0" cy="0" r="28" fill="#f59e0b" />
+    <path d="M -38 0 L -46 0 M 38 0 L 46 0 M 0 -38 L 0 -46 M 0 38 L 0 46 M -28 -28 L -34 -34 M 28 28 L 34 34 M -28 28 L -34 34 M 28 -28 L 34 -34" stroke="#f59e0b" stroke-width="4" stroke-linecap="round" />
+    <!-- Tilted Solar Module -->
+    <polygon points="-12,10 18,-6 32,8 2,24" fill="#0369a1" stroke="#38bdf8" stroke-width="1.5"/>
+  </g>
+  <!-- Wordmark -->
+  <text x="130" y="92" font-family="'Plus Jakarta Sans', sans-serif" font-weight="900" font-size="62" fill="url(#ksGrad)" letter-spacing="-1">KehanSri</text>
+  <text x="132" y="132" font-family="'Plus Jakarta Sans', sans-serif" font-weight="800" font-size="24" fill="#f59e0b" letter-spacing="7">SOLAR ENERGY</text>
+</svg>

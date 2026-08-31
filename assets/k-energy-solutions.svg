@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="500" height="500">
+  <!-- Red Sun Crown on top of K -->
+  <g transform="translate(173, 115)">
+    <!-- Sun center dot -->
+    <circle cx="0" cy="0" r="14" fill="#e11d48" />
+    <!-- 3 Triangular Sun Rays pointing up & out -->
+    <polygon points="-16,-6 -26,-18 -10,-14" fill="#e11d48" />
+    <polygon points="-6,-16 0,-28 6,-16" fill="#e11d48" />
+    <polygon points="10,-14 26,-18 16,-6" fill="#e11d48" />
+  </g>
+
+  <!-- Tall Stylized K in Solar Green -->
+  <!-- Left Vertical Stem with rounded top around the sun crown -->
+  <path d="M 160 120 C 160 112 186 112 186 120 L 186 335 L 160 335 Z" fill="#008852" />
+  
+  <!-- Upper Right Diagonal Arm -->
+  <path d="M 186 248 L 305 120 L 335 120 L 210 252 Z" fill="#008852" />
+  
+  <!-- Lower Right Diagonal Arm -->
+  <path d="M 210 248 L 340 335 L 308 335 L 186 250 Z" fill="#008852" />
+
+  <!-- ENERGY Text in Bold Green Serif -->
+  <text x="250" y="375" text-anchor="middle" font-family="'Plus Jakarta Sans', 'Arial Black', Impact, sans-serif" font-weight="900" font-size="42" fill="#008852" letter-spacing="4">ENERGY</text>
+  
+  <!-- SOLUTIONS Text in Bold Orange -->
+  <text x="250" y="405" text-anchor="middle" font-family="'Plus Jakarta Sans', 'Arial Black', sans-serif" font-weight="800" font-size="28" fill="#f58220" letter-spacing="6">SOLUTIONS</text>
+</svg>

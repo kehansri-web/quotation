@@ -1,0 +1,1942 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Solar Proposal & Quotation Maker Pro</title>
+  <meta name="description" content="10-Page Solar Quotation & Technical Proposal Generator with dynamic KW calculations, net metering diagrams, subsidies, 25-year projections, PDF export & WhatsApp sharing.">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="styles/main.css?v=3.2">
+  <link rel="stylesheet" href="styles/templates.css?v=3.2">
+  <link rel="stylesheet" href="styles/solar-proposal.css?v=3.2">
+  <link rel="stylesheet" href="styles/print.css?v=3.2" media="print">
+
+  <!-- Custom Buttons & Selector Styles -->
+  <style>
+    .brand-switch-group {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.4rem;
+      margin-top: 0.35rem;
+    }
+    @media (max-width: 640px) {
+      .brand-switch-group {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    .brand-btn, .installer-btn {
+      padding: 0.65rem 0.5rem;
+      border-radius: var(--radius-md);
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      font-size: 0.82rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    .brand-btn:hover, .installer-btn:hover {
+      border-color: var(--border-medium);
+      color: var(--text-primary);
+    }
+    .brand-btn.active, .installer-btn.active {
+      background: rgba(0, 136, 82, 0.15);
+      border-color: #008852;
+      color: #10b981;
+      box-shadow: 0 0 12px rgba(0, 136, 82, 0.25);
+    }
+
+    /* System Type Switch Group */
+    .system-type-switch-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 6px;
+      background: rgba(0, 0, 0, 0.25);
+      padding: 4px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-subtle);
+      margin-top: 4px;
+    }
+    .btn-system-type {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-secondary);
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 8px 4px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+    .btn-system-type:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-main);
+    }
+    .btn-system-type.active {
+      background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.35);
+      border-color: rgba(16, 185, 129, 0.5);
+    }
+    .btn-system-type.active[data-system-type="off-grid"] {
+      background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
+      box-shadow: 0 2px 8px rgba(245, 158, 11, 0.35);
+      border-color: rgba(245, 158, 11, 0.5);
+    }
+    .btn-system-type.active[data-system-type="hybrid"] {
+      background: linear-gradient(135deg, #0284c7 0%, #38bdf8 100%);
+      box-shadow: 0 2px 8px rgba(56, 189, 248, 0.35);
+      border-color: rgba(56, 189, 248, 0.5);
+    }
+
+    /* Customer Category Switch Group (Residential & C&I) */
+    .customer-type-switch-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      background: rgba(0, 0, 0, 0.25);
+      padding: 4px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-subtle);
+      margin-top: 4px;
+    }
+    .btn-customer-type {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-secondary);
+      font-size: 0.82rem;
+      font-weight: 700;
+      padding: 8px 6px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+    }
+    .btn-customer-type:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-main);
+    }
+    .btn-customer-type.active {
+      background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.35);
+      border-color: rgba(16, 185, 129, 0.5);
+    }
+    .btn-customer-type.active[data-customer-type="commercial"] {
+      background: linear-gradient(135deg, #0284c7 0%, #38bdf8 100%);
+      box-shadow: 0 2px 8px rgba(56, 189, 248, 0.35);
+      border-color: rgba(56, 189, 248, 0.5);
+    }
+    .kw-presets-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 0.4rem;
+    }
+    .kw-preset-btn {
+      padding: 0.25rem 0.6rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border-radius: var(--radius-sm);
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    .kw-preset-btn:hover {
+      background: #008852;
+      color: #ffffff;
+    }
+    .logo-enhancer-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg-tertiary);
+      padding: 0.5rem 0.75rem;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-subtle);
+      margin-top: 0.5rem;
+      gap: 0.75rem;
+    }
+    .logo-enhancer-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .logo-enhancer-slider {
+      flex: 1;
+      accent-color: #008852;
+      cursor: pointer;
+    }
+  </style>
+
+  <!-- PDF & Canvas Generation CDN Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+
+  <!-- =========================================================================
+       FULL-SCREEN AUTHENTICATION GATE / LOGIN SCREEN (OPENS FIRST)
+       ========================================================================= -->
+  <div id="auth-login-gate" class="auth-gate-screen">
+    <div class="auth-gate-background">
+      <div class="auth-ambient-glow glow-1"></div>
+      <div class="auth-ambient-glow glow-2"></div>
+      <div class="auth-grid-overlay"></div>
+    </div>
+
+    <div class="auth-card-container">
+      <!-- Brand Logo & Title -->
+      <div class="auth-brand-header">
+        <div class="auth-brand-logo">
+          ☀️
+        </div>
+        <div class="auth-brand-text">
+          <h2>QuoteCraft <span>Solar Pro</span></h2>
+          <p>10-Page Dynamic Solar Quotation & Proposal System</p>
+        </div>
+      </div>
+
+      <!-- Login Card -->
+      <div class="auth-card">
+        <!-- Role Switcher Tabs -->
+        <div class="auth-role-tabs">
+          <button type="button" class="auth-role-btn active" id="gate-tab-sales">
+            <span>👤</span>
+            <span>Salesperson</span>
+          </button>
+          <button type="button" class="auth-role-btn" id="gate-tab-admin">
+            <span>🛡️</span>
+            <span>Administrator</span>
+          </button>
+        </div>
+
+        <form id="form-gate-login">
+          <!-- Role Hint Box -->
+          <div id="gate-hint-box" class="auth-hint-box">
+            <div><strong>Sales Representative Sign In:</strong></div>
+            <div style="margin-top: 2px;">Please enter your authorized username and password to open the quotation workspace.</div>
+          </div>
+
+          <div id="gate-login-error" class="auth-error-box" style="display: none;"></div>
+
+          <div class="form-group" style="margin-bottom: 14px;">
+            <label class="form-label" for="inp-gate-user" id="lbl-gate-user">Username</label>
+            <input type="text" id="inp-gate-user" class="form-control auth-input" placeholder="Enter username" required autocomplete="username">
+          </div>
+
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label class="form-label" for="inp-gate-pass">Password</label>
+            <div style="display: flex; gap: 6px; align-items: center;">
+              <input type="password" id="inp-gate-pass" class="form-control auth-input" placeholder="Enter password" required autocomplete="current-password" style="flex: 1;">
+              <button type="button" id="btn-toggle-gate-pass" class="btn btn-secondary btn-icon-only" title="Show/Hide Password" style="padding: 0 12px; height: 42px; border-radius: 10px;">👁️</button>
+            </div>
+          </div>
+
+          <button type="submit" class="auth-submit-btn" id="btn-submit-gate-login">
+            <span>🚀 Sign In & Open Quotation Workspace</span>
+          </button>
+        </form>
+
+        <div class="auth-features-footer">
+          <div>🔒 Bank Details Protected</div>
+          <div>📄 10-Page HD Proposals</div>
+          <div>☁️ Central DB Sync</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MAIN APPLICATION WORKSPACE (PROTECTED - VISIBLE ONLY AFTER LOGIN)
+       ========================================================================= -->
+  <div id="app-main-workspace" class="app-main-workspace" style="display: none;">
+
+    <!-- Application Header -->
+    <header class="app-header">
+      <div class="brand-wrapper">
+        <div class="brand-icon" style="background: linear-gradient(135deg, #008852 0%, #059669 100%);">
+          ☀️
+        </div>
+        <div class="brand-info">
+          <h1>QuoteCraft <span class="badge-pro" style="background: rgba(0, 136, 82, 0.2); color: #10b981; border-color: rgba(0, 136, 82, 0.4);">Solar Pro</span></h1>
+          <p>10-Page Dynamic Solar Proposal Generator</p>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <!-- Logged In User Status Badge -->
+        <div id="header-user-status" class="header-user-pill">
+          <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#10b981;"></span>
+          <span>SALES</span>
+        </div>
+
+        <button class="btn btn-secondary btn-sm" id="btn-load-sample" title="Load sample 5 KW solar proposal data">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/><path d="m16 9 5-5m0 0h-4m4 0v4"/></svg>
+          Sample 5 KW
+        </button>
+
+        <button class="btn btn-primary btn-sm btn-save-quote-action" id="btn-header-save" title="Save this solar proposal to Cloud & History" style="font-weight: 700; box-shadow: 0 0 14px rgba(16, 185, 129, 0.3);">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          Save Proposal
+        </button>
+
+        <button class="btn btn-secondary btn-sm" id="btn-open-history" title="View saved proposal history">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/></svg>
+          History
+        </button>
+
+        <button class="btn btn-secondary btn-sm" id="btn-new-quote" title="Create a new blank solar proposal">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+          New Proposal
+        </button>
+
+        <button class="btn btn-ghost btn-icon-only" id="btn-export-json" title="Export as JSON backup">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        </button>
+
+        <label class="btn btn-ghost btn-icon-only" title="Import JSON backup" style="cursor: pointer;">
+          <input type="file" id="file-import-json" accept=".json" style="display: none;">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        </label>
+
+        <button class="btn btn-secondary btn-sm" id="btn-header-admin" title="Admin Portal & Master Settings" style="border-color: rgba(16, 185, 129, 0.4); color: #10b981;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <span>Admin Portal</span>
+        </button>
+
+        <button class="btn btn-secondary btn-sm" id="btn-header-logout" title="Sign out and lock workspace" style="border-color: rgba(239, 68, 68, 0.4); color: #f87171;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          <span>Sign Out</span>
+        </button>
+
+        <button class="btn btn-ghost btn-icon-only" id="btn-toggle-theme" title="Toggle Light/Dark Theme">
+          <!-- SVG injected dynamically -->
+        </button>
+      </div>
+    </header>
+
+  <!-- =========================================================================
+       Main Application Container
+       ========================================================================= -->
+  <main class="app-container">
+
+    <!-- Mobile View Switcher Tabs -->
+    <div class="mobile-view-tabs span-2">
+      <button class="mobile-tab-btn active" id="tab-btn-edit">✏️ Edit Solar Details</button>
+      <button class="mobile-tab-btn" id="tab-btn-preview">👁️ 10-Page Preview</button>
+    </div>
+
+    <!-- =======================================================================
+         LEFT COLUMN: SOLAR PROPOSAL CONTROLS & EDITOR
+         ======================================================================= -->
+    <section class="editor-pane">
+
+      <!-- SECTION 1: INSTALLER COMPANY & BRAND PARTNER -->
+      <div class="card-section">
+        <div class="card-header">
+          <div class="card-header-title">
+            <div class="card-header-icon" style="background: rgba(0, 136, 82, 0.15); color: #10b981;">🏢</div>
+            <span>Installer Company &amp; Partner Branding</span>
+          </div>
+          <span class="card-toggle-icon">▾</span>
+        </div>
+        <div class="card-body">
+          
+          <!-- 1. Installer Company Brand Preset Switcher -->
+          <div class="form-group">
+            <label class="form-label">
+              <span>Choose Installer Branding</span>
+              <span style="font-size: 0.72rem; color: #10b981;">Switches Logo &amp; Info across All 10 Pages</span>
+            </label>
+            <div class="installer-brand-switch-group" id="installer-brand-buttons">
+              <button type="button" class="btn-installer-brand active" data-installer-brand="kehansri" id="btn-brand-kehansri">
+                <span>☀️ KehanSri Solar</span>
+              </button>
+              <button type="button" class="btn-installer-brand" data-installer-brand="kenergy" id="btn-brand-kenergy">
+                <span>⚡ K Energy Solutions</span>
+              </button>
+              <button type="button" class="btn-installer-brand" data-installer-brand="custom" id="btn-brand-custom">
+                <span>✏️ Custom Installer</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 2. Active Installer Profile Preview Card -->
+          <div class="installer-active-preview-card" id="installer-preview-card">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <div class="installer-logo-preview-box">
+                  <img id="img-active-installer-logo" src="assets/kehansri-solar-logo.png" alt="Active Installer Logo">
+                </div>
+                <div>
+                  <div id="lbl-active-installer-name" style="font-weight: 800; font-size: 0.88rem; color: var(--text-main);">KehanSri Solar</div>
+                  <div id="lbl-active-installer-sub" style="font-size: 0.72rem; color: #10b981; font-weight: 600;">Official Installer &bull; All 10 Pages Updated</div>
+                </div>
+              </div>
+              <span class="badge" id="badge-active-brand-type" style="background: rgba(16, 185, 129, 0.15); color: #10b981; font-size: 0.7rem; font-weight: 700;">DEFAULT</span>
+            </div>
+          </div>
+
+          <!-- 3. Custom Installer Name & Logo Upload Box (Visible for Custom / Editable) -->
+          <div class="custom-installer-fields-box" id="custom-installer-fields" style="display: none;">
+            <div class="form-group" style="margin-bottom: 0.65rem;">
+              <label class="form-label" for="inp-custom-company-name">
+                <span>Custom Company Name</span>
+                <span class="req">*</span>
+              </label>
+              <input type="text" id="inp-custom-company-name" class="form-control" placeholder="e.g. Sunrise Solar EPC Pvt Ltd">
+            </div>
+
+            <!-- Custom Logo File Upload -->
+            <div class="form-group" style="margin-bottom: 0.65rem;">
+              <label class="form-label">
+                <span>Upload Custom Logo (.PNG / .SVG / .JPG)</span>
+              </label>
+              <div style="display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
+                <label class="btn btn-secondary btn-sm" style="cursor: pointer; display: inline-flex; align-items: center; gap: 5px;">
+                  <input type="file" id="file-custom-installer-logo" accept="image/*" style="display: none;">
+                  <span>🖼️ Choose Logo Image</span>
+                </label>
+                <button type="button" class="btn btn-secondary btn-sm" id="btn-remove-custom-logo" style="display: none; color: #ef4444; border-color: rgba(239,68,68,0.3);">
+                  <span>✕ Reset to Default Logo</span>
+                </button>
+              </div>
+              <div id="custom-logo-preview-wrapper" style="display: none; margin-top: 6px; padding: 6px 10px; background: rgba(0,0,0,0.2); border-radius: 6px; align-items: center; gap: 8px;">
+                <img id="custom-logo-preview-img" src="" alt="Custom Logo" style="max-height: 32px; max-width: 120px; object-fit: contain;">
+                <span style="font-size: 0.72rem; color: #10b981; font-weight: 600;">Custom Logo Loaded Successfully</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4. Logo Size Enhancer Control (+ / - / Slider) -->
+          <div class="form-group" style="margin-top: 0.65rem; border-top: 1px solid var(--border-subtle); padding-top: 0.65rem;">
+            <label class="form-label">
+              <span>🔍 Logo Size Enhancer (All 10 Pages)</span>
+              <span id="logo-size-val" style="font-size: 0.75rem; font-weight: 700; color: #10b981;">85px</span>
+            </label>
+            <div class="logo-enhancer-bar">
+              <button type="button" class="btn-row-action" id="btn-logo-decrease" title="Make Logos Smaller">🔍−</button>
+              <input type="range" id="range-logo-size" class="logo-enhancer-slider" min="45" max="140" value="85" step="2">
+              <button type="button" class="btn-row-action" id="btn-logo-increase" title="Make Logos Bigger">🔍+</button>
+              <button type="button" class="btn-row-action" id="btn-logo-reset" title="Reset Logo Size" style="font-size: 0.72rem;">↺</button>
+            </div>
+          </div>
+
+          <!-- 5. Partner Brand Switcher (Adani vs Waaree vs Tata Power vs Custom) -->
+          <div class="form-group" style="margin-top: 0.65rem; border-top: 1px solid var(--border-subtle); padding-top: 0.65rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <label class="form-label" style="margin-bottom: 0;">
+                <span>Solar Module &amp; Inverter Partner Brand</span>
+              </label>
+              <span id="badge-partner-brand-status" style="font-size: 0.72rem; color: #10b981; font-weight: 700;">⚡ ADANI Power</span>
+            </div>
+            <div class="brand-switch-group" id="partner-brand-buttons">
+              <button type="button" class="brand-btn active" data-brand="adani" id="btn-partner-adani" onclick="selectPartnerBrand('adani')">
+                <span>⚡ ADANI</span>
+              </button>
+              <button type="button" class="brand-btn" data-brand="waaree" id="btn-partner-waaree" onclick="selectPartnerBrand('waaree')">
+                <span>🌱 WAAREE</span>
+              </button>
+              <button type="button" class="brand-btn" data-brand="tata" id="btn-partner-tata" onclick="selectPartnerBrand('tata')">
+                <span>🔷 TATA</span>
+              </button>
+              <button type="button" class="brand-btn" data-brand="custom" id="btn-partner-custom" onclick="selectPartnerBrand('custom')">
+                <span>✏️ Custom Logo</span>
+              </button>
+            </div>
+
+            <!-- Custom Partner Brand Upload & Name Panel (Visible when Custom is active or file uploaded) -->
+            <div id="custom-partner-fields" style="display: none; margin-top: 8px; padding: 10px 12px; background: rgba(0, 0, 0, 0.25); border: 1px dashed rgba(16, 185, 129, 0.35); border-radius: var(--radius-md);">
+              <div class="form-group" style="margin-bottom: 0.65rem;">
+                <label class="form-label" for="inp-custom-partner-name">
+                  <span>Custom Partner Brand / OEM Name</span>
+                  <span style="font-size: 0.7rem; color: #10b981;">e.g. Vikram Solar, Goldi Solar, Premier Energies</span>
+                </label>
+                <input type="text" id="inp-custom-partner-name" class="form-control" placeholder="e.g. Vikram Solar / Goldi Solar">
+              </div>
+
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">
+                  <span>Upload Partner Brand Logo (.PNG / .SVG / .JPG)</span>
+                </label>
+                <div style="display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
+                  <label class="btn btn-secondary btn-sm" style="cursor: pointer; display: inline-flex; align-items: center; gap: 5px;">
+                    <input type="file" id="file-custom-partner-logo" accept="image/*" style="display: none;">
+                    <span>🖼️ Choose Partner Logo</span>
+                  </label>
+                  <button type="button" class="btn btn-secondary btn-sm" id="btn-remove-partner-logo" style="display: none; color: #ef4444; border-color: rgba(239, 68, 68, 0.3);">
+                    <span>✕ Reset Partner Logo</span>
+                  </button>
+                </div>
+                <div id="custom-partner-logo-preview-wrapper" style="display: none; margin-top: 8px; padding: 6px 10px; background: rgba(255, 255, 255, 0.05); border-radius: 6px; align-items: center; gap: 10px;">
+                  <div style="background: #ffffff; padding: 3px 8px; border-radius: 4px; display: inline-flex; align-items: center;">
+                    <img id="custom-partner-logo-preview-img" src="" alt="Custom Partner Logo" style="max-height: 28px; max-width: 110px; object-fit: contain;">
+                  </div>
+                  <span style="font-size: 0.72rem; color: #10b981; font-weight: 600;">Partner Logo Loaded &bull; Cover &amp; BOQ Updated</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- SECTION 2: SOLAR CAPACITY & DYNAMIC ENGINEERING -->
+      <div class="card-section">
+        <div class="card-header">
+          <div class="card-header-title">
+            <div class="card-header-icon" style="background: rgba(0, 136, 82, 0.15); color: #10b981;">☀️</div>
+            <span>Plant Capacity, System Type &amp; Specifications</span>
+          </div>
+          <span class="card-toggle-icon">▾</span>
+        </div>
+        <div class="card-body">
+
+          <!-- 1. System Type Switcher (On-Grid / Off-Grid / Hybrid) -->
+          <div class="form-group" style="margin-bottom: 0.85rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <label class="form-label" style="margin-bottom: 0;">
+                <span>⚡ 1. Choose System Type</span>
+              </label>
+              <span id="badge-system-type-status" style="font-size: 0.72rem; color: #10b981; font-weight: 700;">⚡ On-Grid Net Metered</span>
+            </div>
+            <div class="system-type-switch-group" id="system-type-buttons">
+              <button type="button" class="btn-system-type active" data-system-type="on-grid" id="btn-type-ongrid" onclick="selectSystemType('on-grid')">
+                <span>⚡ On-Grid</span>
+              </button>
+              <button type="button" class="btn-system-type" data-system-type="off-grid" id="btn-type-offgrid" onclick="selectSystemType('off-grid')">
+                <span>🔋 Off-Grid</span>
+              </button>
+              <button type="button" class="btn-system-type" data-system-type="hybrid" id="btn-type-hybrid" onclick="selectSystemType('hybrid')">
+                <span>🔄 Hybrid</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 2. Customer Type Switcher (Residential vs C&I) -->
+          <div class="form-group" style="margin-bottom: 0.85rem; border-top: 1px solid var(--border-subtle); padding-top: 0.65rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <label class="form-label" style="margin-bottom: 0;">
+                <span>🏢 2. Customer Category</span>
+              </label>
+              <span id="badge-cust-type-status" style="font-size: 0.72rem; color: #10b981; font-weight: 700;">🏡 Residential (Govt Subsidy)</span>
+            </div>
+            <div class="customer-type-switch-group" id="customer-type-buttons">
+              <button type="button" class="btn-customer-type active" data-customer-type="residential" id="btn-cust-residential" onclick="selectCustomerType('residential')">
+                <span>🏡 Residential</span>
+              </button>
+              <button type="button" class="btn-customer-type" data-customer-type="commercial" id="btn-cust-cni" onclick="selectCustomerType('commercial')">
+                <span>🏭 C&amp;I</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 3. C&I Specific Modeling Box (Visible ONLY when C&I is selected) -->
+          <div id="cni-specific-panel" style="display: none; background: rgba(56, 189, 248, 0.06); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 8px; padding: 10px 12px; margin-bottom: 0.85rem;">
+            <div style="font-size: 0.78rem; font-weight: 800; color: #38bdf8; display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+              <span>🏭 C&amp;I Energy Consumption &amp; Tax Settings</span>
+              <span style="font-size: 0.7rem; color: #10b981; font-weight: 700;">📄 Dedicated Page 8 Added</span>
+            </div>
+
+            <div class="grid-2">
+              <div class="form-group" style="margin-bottom: 6px;">
+                <label class="form-label" for="inp-cni-monthly-units">
+                  <span>Monthly Electricity Usage (Units / kWh)</span>
+                  <span style="font-size: 0.7rem; color: #38bdf8;">Auto-calculates sizing</span>
+                </label>
+                <input type="number" id="inp-cni-monthly-units" class="form-control" placeholder="e.g. 5000">
+              </div>
+
+              <div class="form-group" style="margin-bottom: 6px;">
+                <label class="form-label" for="inp-cni-tax-bracket">Corporate Tax Bracket</label>
+                <select id="inp-cni-tax-bracket" class="form-control">
+                  <option value="25" selected>25% (Standard MSME / Corporate)</option>
+                  <option value="22">22% (Sec 115BAA Domestic Co)</option>
+                  <option value="30">30% (High Bracket / Partnership / Prop)</option>
+                </select>
+              </div>
+            </div>
+
+            <div id="cni-consumption-live-feedback" style="display: none; font-size: 0.72rem; color: #38bdf8; background: rgba(2, 132, 199, 0.1); padding: 5px 8px; border-radius: 4px; margin-top: 4px;">
+              💡 Annual: <strong id="lbl-cni-ann-units">0 Units/yr</strong> &bull; Sizing: <strong id="lbl-cni-rec-kw">0 KW</strong> &bull; Solar Offset: <strong id="lbl-cni-offset">0%</strong>
+            </div>
+          </div>
+
+          <!-- Dynamic KW Capacity Input -->
+          <div class="grid-2" style="border-top: 1px solid var(--border-subtle); padding-top: 0.65rem;">
+            <div class="form-group">
+              <label class="form-label" for="inp-solar-kw">
+                <span>Plant Capacity (KW) <span class="req">*</span></span>
+                <span style="font-size: 0.72rem; color: #10b981;">Auto-scales generation</span>
+              </label>
+              <input type="number" id="inp-solar-kw" class="form-control" step="0.5" min="1" max="1000" value="5" placeholder="e.g. 5">
+              
+              <!-- Quick Presets Container -->
+              <div class="kw-presets-row" id="kw-presets-container">
+                <button type="button" class="kw-preset-btn" data-kw="3">3 KW</button>
+                <button type="button" class="kw-preset-btn" data-kw="5">5 KW</button>
+                <button type="button" class="kw-preset-btn" data-kw="8">8 KW</button>
+                <button type="button" class="kw-preset-btn" data-kw="10">10 KW</button>
+                <button type="button" class="kw-preset-btn" data-kw="15">15 KW</button>
+                <button type="button" class="kw-preset-btn" data-kw="25">25 KW</button>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="inp-solar-tariff">Grid Electricity Tariff (₹/unit)</label>
+              <input type="number" id="inp-solar-tariff" class="form-control" step="0.1" min="1" value="7.50" placeholder="7.50">
+            </div>
+          </div>
+
+          <!-- Module Type, Wattage & No of Modules Override -->
+          <div class="grid-3" style="margin-top: 0.4rem;">
+            <div class="form-group">
+              <label class="form-label" for="inp-solar-type">
+                <span>Module Type</span>
+                <span style="font-size: 0.72rem; color: #10b981;">Page BOQ</span>
+              </label>
+              <input type="text" id="inp-solar-type" class="form-control" list="module-type-suggestions" value="TOPCON" placeholder="e.g. TOPCON">
+              <datalist id="module-type-suggestions">
+                <option value="TOPCON">
+                <option value="Mono Perc">
+                <option value="Bifacial TOPCON">
+                <option value="DCR TOPCON">
+                <option value="Polycrystalline">
+              </datalist>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="inp-solar-wattage">
+                <span>Module Wattage</span>
+                <span style="font-size: 0.72rem; color: #10b981;">e.g. 620 Wp</span>
+              </label>
+              <input type="number" id="inp-solar-wattage" class="form-control" value="620" placeholder="620">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="inp-module-count">
+                <span>No. of Modules</span>
+                <span style="font-size: 0.72rem; color: #10b981;">Count</span>
+              </label>
+              <input type="number" id="inp-module-count" class="form-control" placeholder="Auto (e.g. 8)">
+            </div>
+          </div>
+
+          <!-- Structure Type & Inverter Phase / Warranty -->
+          <div class="form-group" style="margin-top: 0.4rem;">
+            <label class="form-label" for="inp-solar-structure">Structure Type (Type any text)</label>
+            <input type="text" id="inp-solar-structure" class="form-control" list="structure-suggestions" value="Elevated" placeholder="e.g. Elevated, Standard Galvanized, Super Structure">
+            <datalist id="structure-suggestions">
+              <option value="Elevated">
+              <option value="Standard Galvanized structure(hot dip)">
+              <option value="Super Structure High-Rise">
+              <option value="Tin Shed / Industrial Mount">
+              <option value="RCC Rooftop Standard Mount">
+            </datalist>
+          </div>
+
+          <div class="grid-2" style="margin-top: 0.4rem;">
+            <div class="form-group">
+              <label class="form-label" for="inp-inverter-phase">Inverter Phase</label>
+              <select id="inp-inverter-phase" class="form-control">
+                <option value="Single Phase">Single Phase</option>
+                <option value="Three Phase">Three Phase</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="inp-inverter-warranty">Inverter Warranty</label>
+              <input type="text" id="inp-inverter-warranty" class="form-control" value="08 Years" placeholder="08 Years">
+            </div>
+          </div>
+
+          <div class="grid-2" style="margin-top: 0.4rem;">
+            <div class="form-group">
+              <label class="form-label" for="inp-inverter-rating">
+                <span>Rating kW / Inverter</span>
+                <span style="font-size: 0.72rem; color: #10b981;">BOQ</span>
+              </label>
+              <input type="text" id="inp-inverter-rating" class="form-control" value="5 kW" placeholder="e.g. 5 kW">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="inp-inverter-qty">
+                <span>Inverter Qty</span>
+                <span style="font-size: 0.72rem; color: #10b981;">BOQ</span>
+              </label>
+              <input type="text" id="inp-inverter-qty" class="form-control" value="1 No(s)" placeholder="e.g. 1 No(s)">
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-top: 0.4rem;">
+            <label class="form-label" for="inp-inverter-spec">
+              <span>Inverter Specification</span>
+              <span style="font-size: 0.72rem; color: #10b981;">BOQ</span>
+            </label>
+            <input type="text" id="inp-inverter-spec" class="form-control" value="5 kW Single Phase" placeholder="e.g. 5 kW Single Phase">
+          </div>
+
+          <div class="form-group" style="margin-top: 0.4rem;">
+            <label class="form-label" for="inp-inverter-manufacturer">Inverter Manufacturer</label>
+            <input type="text" id="inp-inverter-manufacturer" class="form-control" value="As supplied by ADANI Power Solar (Polycab)." placeholder="e.g. As supplied by ADANI Power Solar">
+          </div>
+
+          <!-- Commercials & Subsidy Override -->
+          <div class="grid-3" style="border-top: 1px solid var(--border-subtle); padding-top: 0.85rem; margin-top: 0.5rem;">
+            <div class="form-group">
+              <label class="form-label" for="inp-solar-cost-kw">Base Cost / KW (₹)</label>
+              <input type="number" id="inp-solar-cost-kw" class="form-control" value="55096.42" placeholder="55096.42">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="inp-solar-gst">GST (%)</label>
+              <input type="number" id="inp-solar-gst" class="form-control" value="8.9" step="0.1" placeholder="8.9">
+            </div>
+
+            <div class="form-group" id="group-solar-subsidy">
+              <label class="form-label" for="inp-solar-subsidy">
+                <span>Govt Subsidy (₹)</span>
+                <span id="lbl-subsidy-badge" style="font-size: 0.7rem; color: #10b981;">PM Surya Ghar</span>
+              </label>
+              <input type="number" id="inp-solar-subsidy" class="form-control" placeholder="Auto PM Surya Ghar">
+            </div>
+          </div>
+
+          <!-- Google Maps Project Location Link & Live Satellite Controls -->
+          <div class="form-group" style="margin-top: 0.5rem; border-top: 1px solid var(--border-subtle); padding-top: 0.65rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+              <label class="form-label" for="inp-google-maps-url" style="margin-bottom: 0;">
+                <span>📍 Google Maps / Site Location</span>
+              </label>
+              <button type="button" id="btn-detect-map-location" class="btn btn-secondary" style="font-size: 0.7rem; padding: 2px 8px; height: 24px; color: #10b981; border-color: rgba(16, 185, 129, 0.3);" title="Detect coordinates from Client Billing Address">
+                🎯 Use Billing Addr
+              </button>
+            </div>
+            
+            <input type="text" id="inp-google-maps-url" class="form-control" placeholder="Paste Google Maps URL, Embed code, Coords (e.g. 17.385, 78.486) or Address">
+
+            <!-- Live Map Status & Controls Bar -->
+            <div style="margin-top: 8px; display: flex; flex-direction: column; gap: 6px;">
+              <div id="map-status-pill" class="map-status-pill" style="font-size: 0.72rem; padding: 4px 8px; border-radius: 4px; background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.25); display: flex; align-items: center; gap: 5px;">
+                <span>🛰️ Satellite Map Ready (Rendered on Page 3)</span>
+              </div>
+
+              <!-- Satellite Zoom & Quick Tools -->
+              <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-subtle); border-radius: 6px; padding: 5px 8px;">
+                <div style="display: flex; align-items: center; gap: 6px; flex: 1;">
+                  <span style="font-size: 0.7rem; color: var(--text-muted); white-space: nowrap;">Zoom:</span>
+                  <input type="range" id="inp-map-zoom" min="14" max="19" value="17" step="1" style="flex: 1; accent-color: #10b981; height: 4px; cursor: pointer;">
+                  <span id="txt-map-zoom" style="font-size: 0.72rem; font-weight: 700; color: #10b981; width: 26px;">17x</span>
+                </div>
+
+                <div style="display: flex; gap: 4px; align-items: center;">
+                  <label class="btn btn-secondary" style="cursor: pointer; font-size: 0.7rem; padding: 3px 7px; margin: 0; display: inline-flex; align-items: center; gap: 3px;" title="Upload drone shot or site survey photo">
+                    <span>📸 Upload Photo</span>
+                    <input type="file" id="inp-custom-map-image" accept="image/*" style="display: none;">
+                  </label>
+                  <button type="button" id="btn-reset-map-image" class="btn btn-secondary" style="font-size: 0.7rem; padding: 3px 6px; display: none;" title="Revert to Satellite View">Reset</button>
+                </div>
+              </div>
+
+              <!-- Live Mini Satellite Thumbnail Preview -->
+              <div id="map-preview-thumb-container" style="display: flex; align-items: center; gap: 8px; margin-top: 2px;">
+                <div style="width: 64px; height: 38px; border-radius: 4px; overflow: hidden; border: 1px solid var(--border-subtle); background: #0f172a; flex-shrink: 0;">
+                  <img id="map-preview-thumb" src="assets/satellite-map-default.png" alt="Map Preview" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <div style="font-size: 0.7rem; color: var(--text-muted); line-height: 1.3; overflow: hidden;">
+                  <div id="map-preview-title" style="font-weight: 600; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 190px;">Tarnaka, Hyderabad</div>
+                  <div id="map-preview-coords" style="color: #10b981; font-family: monospace; font-size: 0.68rem;">17.3850° N, 78.4867° E</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dynamic Solar ROI Live Summary -->
+          <div class="totals-breakdown-card" style="margin-top: 0.85rem; background: rgba(0, 136, 82, 0.08); border-color: rgba(0, 136, 82, 0.3);">
+            <div class="totals-row">
+              <span>Plant Capacity:</span>
+              <strong id="sum-solar-kw" style="color: #10b981;">5 KW</strong>
+            </div>
+            <div class="totals-row">
+              <span>Est. Annual Generation:</span>
+              <strong id="sum-solar-gen">8,000 Units/yr</strong>
+            </div>
+            <div class="totals-row">
+              <span>Est. Annual Savings:</span>
+              <strong id="sum-solar-sav" style="color: #10b981;">₹ 60,000/yr</strong>
+            </div>
+            <div class="totals-row">
+              <span>Total Project Cost (inc. GST):</span>
+              <strong id="sum-solar-cost">₹ 3,00,000</strong>
+            </div>
+
+            <!-- Residential Mode Subsidy Row -->
+            <div class="totals-row" id="row-sum-subsidy" style="color: #059669;">
+              <span>MNRE Central Subsidy:</span>
+              <strong id="sum-solar-sub">-₹ 78,000</strong>
+            </div>
+
+            <!-- C&I Mode Tax Shield & GST ITC Rows -->
+            <div class="totals-row" id="row-sum-cni-tax" style="color: #0284c7; display: none;">
+              <span>40% AD Tax Shield (Yr 1):</span>
+              <strong id="sum-cni-tax-shield">-₹ 0</strong>
+            </div>
+            <div class="totals-row" id="row-sum-cni-itc" style="color: #0d9488; display: none;">
+              <span>GST Input Tax Credit (ITC):</span>
+              <strong id="sum-cni-itc">-₹ 0</strong>
+            </div>
+
+            <div class="totals-row grand-total" style="border-color: rgba(0, 136, 82, 0.4);">
+              <span id="lbl-grand-total-name">Effective Net Cost:</span>
+              <span class="grand-total-val" id="sum-solar-net" style="color: #10b981;">₹ 2,22,000</span>
+            </div>
+            <div class="totals-row" style="font-size: 0.8rem; padding-top: 0.3rem;">
+              <span>Estimated Payback Period:</span>
+              <strong id="sum-solar-payback" style="color: #f59e0b;">3.7 Yrs</strong>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- SECTION 3: CLIENT DETAILS (PREPARED FOR) -->
+      <div class="card-section">
+        <div class="card-header">
+          <div class="card-header-title">
+            <div class="card-header-icon">👤</div>
+            <span>Client Information (Prepared For)</span>
+          </div>
+          <span class="card-toggle-icon">▾</span>
+        </div>
+        <div class="card-body">
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label" for="inp-client-name">Client / Customer Name <span class="req">*</span></label>
+              <input type="text" id="inp-client-name" class="form-control" placeholder="e.g. Mr. Sathish">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="inp-client-phone">
+                <span>Client WhatsApp / Mobile</span>
+                <span style="font-size: 0.7rem; color: var(--accent-whatsapp);">1-click WhatsApp share</span>
+              </label>
+              <input type="tel" id="inp-client-phone" class="form-control" placeholder="+91 9493858086">
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label" for="inp-client-email">Email Address</label>
+              <input type="email" id="inp-client-email" class="form-control" placeholder="sathish@gmail.com">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="inp-client-company">Project / Company Description</label>
+              <input type="text" id="inp-client-company" class="form-control" placeholder="Residential Solar Rooftop">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="inp-client-address">Site / Rooftop Installation Address</label>
+            <textarea id="inp-client-address" class="form-control" rows="2" placeholder="Gachibowli, Hyderabad, Telangana"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 4: COMPANY & SALES REP (ACCOUNT LINKED) -->
+      <div class="card-section">
+        <div class="card-header">
+          <div class="card-header-title">
+            <div class="card-header-icon" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8;">👤</div>
+            <span>Salesperson &amp; Installer Details</span>
+          </div>
+          <span class="card-toggle-icon">▾</span>
+        </div>
+        <div class="card-body">
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label" for="inp-biz-name">Company Name</label>
+              <input type="text" id="inp-biz-name" class="form-control" value="KehanSri Solar">
+            </div>
+
+            <!-- Prepared By (Account-Linked & Admin Assignable) -->
+            <div class="form-group">
+              <label class="form-label" for="inp-biz-rep">
+                <span>Prepared By (Salesperson)</span>
+                <span id="badge-sales-account-link" style="font-size: 0.7rem; color: #10b981; font-weight: 700;">🔗 Linked to Account</span>
+              </label>
+
+              <!-- For Admin: Dropdown to assign to any Salesperson -->
+              <div id="admin-sales-assign-wrapper" style="display: none; margin-bottom: 6px; padding: 8px 10px; background: rgba(56, 189, 248, 0.08); border: 1px dashed rgba(56, 189, 248, 0.4); border-radius: 6px;">
+                <label style="font-size: 0.72rem; color: #38bdf8; font-weight: 700; display: block; margin-bottom: 4px;">
+                  👑 Admin: Assign Proposal to Sales Account:
+                </label>
+                <select id="sel-admin-assigned-rep" class="form-control" style="background: var(--bg-secondary); border-color: rgba(56, 189, 248, 0.5); color: #38bdf8; font-weight: 700; font-size: 0.82rem;">
+                  <option value="">Loading Sales Accounts...</option>
+                </select>
+              </div>
+
+              <input type="text" id="inp-biz-rep" class="form-control" value="Sales Executive" readonly style="background: rgba(255,255,255,0.05); cursor: default; font-weight: 600;">
+              <div id="txt-sales-account-hint" style="font-size: 0.7rem; color: var(--text-muted); margin-top: 3px;">
+                👤 Account: <span id="lbl-active-sales-username" style="font-weight: 700; color: #10b981;">SALES</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid-3">
+            <div class="form-group">
+              <label class="form-label" for="inp-biz-email">Official Email</label>
+              <input type="email" id="inp-biz-email" class="form-control" value="Solar_Sales_team@kehansri.com">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="inp-biz-phone">Contact Phone</label>
+              <input type="tel" id="inp-biz-phone" class="form-control" value="+91 8328551689">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="inp-biz-tax">GSTIN / Tax ID</label>
+              <input type="text" id="inp-biz-tax" class="form-control" value="36AAFCK9821K1Z4">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="inp-biz-address">Registered Office Address</label>
+            <textarea id="inp-biz-address" class="form-control" rows="2">Plot No 2-55, Sri Shyam Nagar, Telecom Nagar, Gachibowli, Hyderabad, District-Ranga Reddy, PIN: 500032</textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 5: BANKING & PAYMENT DETAILS (ADMIN PROTECTED) -->
+      <div class="card-section">
+        <div class="card-header">
+          <div class="card-header-title">
+            <div class="card-header-icon">💳</div>
+            <span>Payment & Bank Details</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <button type="button" id="btn-admin-auth-toggle" class="btn btn-secondary" style="font-size: 0.72rem; padding: 3px 8px; height: 25px; color: #10b981; border-color: rgba(16, 185, 129, 0.3);">
+              <span>🔒 Unlock (Admin)</span>
+            </button>
+            <span class="card-toggle-icon">▾</span>
+          </div>
+        </div>
+        <div class="card-body">
+          <!-- Admin Security Lock Status Badge -->
+          <div id="bank-lock-badge" class="bank-lock-badge locked" style="margin-bottom: 12px; font-size: 0.75rem; padding: 6px 10px; border-radius: 6px; display: flex; align-items: center; justify-content: space-between;">
+            <span>🔒 Official Company Bank Account (Admin Protected — Read-Only for Sales)</span>
+          </div>
+
+          <!-- Bank Account 1 vs Bank Account 2 Switcher -->
+          <div class="form-group" style="margin-bottom: 14px;">
+            <label class="form-label" style="font-weight: 700; color: #10b981; display: flex; align-items: center; justify-content: space-between;">
+              <span>🏦 Select Bank Account for this Proposal:</span>
+              <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: normal;">(Choose Bank 1 or Bank 2 &bull; Locked for Sales)</span>
+            </label>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <label class="bank-choice-card active" id="card-choice-bank1" style="cursor: pointer; padding: 9px 12px; border: 2px solid #10b981; border-radius: 8px; background: rgba(16, 185, 129, 0.08); display: flex; align-items: center; gap: 10px; transition: all 0.2s ease;">
+                <input type="radio" name="rad-bank-choice" id="rad-bank-choice-1" value="bank1" checked style="accent-color: #10b981;">
+                <div>
+                  <div style="font-weight: 700; font-size: 0.85rem; color: var(--text-primary);" id="lbl-bank1-title">Bank 1: KehanSri Solar</div>
+                  <div style="font-size: 0.72rem; color: var(--text-secondary);" id="lbl-bank1-subtitle">ICICI BANK &bull; 38205006367</div>
+                </div>
+              </label>
+
+              <label class="bank-choice-card" id="card-choice-bank2" style="cursor: pointer; padding: 9px 12px; border: 1px solid var(--border-subtle); border-radius: 8px; background: var(--bg-tertiary); display: flex; align-items: center; gap: 10px; transition: all 0.2s ease;">
+                <input type="radio" name="rad-bank-choice" id="rad-bank-choice-2" value="bank2" style="accent-color: #10b981;">
+                <div>
+                  <div style="font-weight: 700; font-size: 0.85rem; color: var(--text-primary);" id="lbl-bank2-title">Bank 2: K Energy Solutions</div>
+                  <div style="font-size: 0.72rem; color: var(--text-secondary);" id="lbl-bank2-subtitle">HDFC BANK &bull; 50200088991122</div>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label" for="inp-bank-name">Bank Name</label>
+              <input type="text" id="inp-bank-name" class="form-control input-locked" value="ICICI BANK" readonly>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="inp-acc-name">Account Name</label>
+              <input type="text" id="inp-acc-name" class="form-control input-locked" value="KehanSri Solar" readonly>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label" for="inp-acc-number">Account Number</label>
+              <input type="text" id="inp-acc-number" class="form-control input-locked" value="38205006367" readonly>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="inp-bank-ifsc">IFSC Code</label>
+              <input type="text" id="inp-bank-ifsc" class="form-control input-locked" value="ICIC0000382" readonly>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="inp-payment-notes">Branch Address</label>
+            <input type="text" id="inp-payment-notes" class="form-control input-locked" value="Banjara Hills, Road No 12, Hyderabad: 500034" readonly>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 6: SIGNATURE & ACCEPTANCE -->
+      <div class="card-section">
+        <div class="card-header">
+          <div class="card-header-title">
+            <div class="card-header-icon">✍️</div>
+            <span>Authorized Signatory</span>
+          </div>
+          <span class="card-toggle-icon">▾</span>
+        </div>
+        <div class="card-body">
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label" for="inp-sign-name">Signatory Name</label>
+              <input type="text" id="inp-sign-name" class="form-control" value="Authorized Signatory">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="inp-sign-title">Designation / Company</label>
+              <input type="text" id="inp-sign-title" class="form-control" value="KehanSri Solar">
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-top: 0.5rem;">
+            <label class="form-label">Digital Signature</label>
+            <div id="sign-placeholder-box">
+              <button type="button" class="btn btn-secondary btn-sm" id="btn-open-draw-sig">
+                🖊️ Draw Live Signature
+              </button>
+              <label class="btn btn-secondary btn-sm" style="cursor: pointer; margin-left: 0.4rem;">
+                <input type="file" id="file-sign-img" accept="image/*" style="display: none;">
+                📤 Upload Signature
+              </label>
+            </div>
+
+            <div class="preview-thumbnail" id="sign-preview-wrapper" style="display: none; margin-top: 0.4rem;">
+              <img id="sign-preview-img" src="" alt="Digital Signature">
+              <button type="button" class="btn-remove-thumb" id="btn-remove-sign" title="Remove signature">✕</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Save & Quick Actions Bar at bottom of Editor -->
+      <div style="margin-top: 1rem; margin-bottom: 2rem; padding: 0.85rem 1.1rem; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); display: flex; gap: 0.8rem; align-items: center; justify-content: space-between; box-shadow: 0 4px 14px rgba(0,0,0,0.12);">
+        <div style="display: flex; flex-direction: column;">
+          <span style="font-size: 0.82rem; font-weight: 700; color: var(--text-main);">Save Proposal Draft</span>
+          <span style="font-size: 0.72rem; color: var(--text-muted);">Syncs changes to Cloud DB & Local History</span>
+        </div>
+        <button type="button" class="btn btn-primary btn-save-quote-action" id="btn-bottom-save-quote" title="Save to Database & History" style="font-weight: 700; padding: 0.5rem 1.25rem; box-shadow: 0 0 12px rgba(16, 185, 129, 0.25);">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          <span>Save Proposal</span>
+        </button>
+      </div>
+
+    </section>
+
+    <!-- =======================================================================
+         RIGHT COLUMN: LIVE 10-PAGE PREVIEW & ACTIONS
+         ======================================================================= -->
+    <aside class="preview-pane">
+
+      <!-- Preview Action Bar -->
+      <div class="preview-toolbar">
+        <div class="toolbar-left">
+          <button type="button" class="btn btn-whatsapp" id="btn-open-whatsapp-modal" title="Send Solar Proposal directly via WhatsApp">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.04 14.69 2 12.04 2M12.05 3.67C14.25 3.67 16.31 4.53 17.87 6.09C19.42 7.65 20.28 9.72 20.28 11.92C20.28 16.46 16.58 20.15 12.04 20.15C10.56 20.15 9.11 19.76 7.85 19L7.55 18.83L4.43 19.65L5.26 16.61L5.06 16.29C4.24 15 3.8 13.47 3.8 11.91C3.81 7.37 7.5 3.67 12.05 3.67Z"/>
+            </svg>
+            Send WhatsApp
+          </button>
+
+          <button type="button" class="btn btn-primary" id="btn-download-pdf" title="Download high resolution 10-page PDF proposal">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Download 10-Page PDF
+          </button>
+
+          <button type="button" class="btn btn-secondary" id="btn-print-quote" title="Print document or Save as PDF">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 6 2 18 2 18 9"/>
+              <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+              <rect width="12" height="8" x="6" y="14"/>
+            </svg>
+            Print
+          </button>
+        </div>
+
+        <div class="toolbar-right">
+          <!-- Page Selector Navigator -->
+          <select id="sel-page-preview" class="form-control" style="width: auto; padding: 0.35rem 1.8rem 0.35rem 0.65rem; font-size: 0.75rem; font-weight: 700; background-color: var(--bg-tertiary);">
+            <option value="all">📑 All 10 Pages</option>
+            <option value="1">Page 1: Cover Page</option>
+            <option value="2">Page 2: Working Principle & Net Metering</option>
+            <option value="3">Page 3: Tech Specs & Google Map Location</option>
+            <option value="4">Page 4: Assumptions & Exclusions</option>
+            <option value="5">Page 5: Graphical Projections & SVG Charts</option>
+            <option value="6">Page 6: Safety Standards & Protections</option>
+            <option value="7">Page 7: Commercial Offer & Subsidy</option>
+            <option value="8">Page 8: Technical Details & BOQ</option>
+            <option value="9">Page 9: 10-Year Savings Table</option>
+            <option value="10">Page 10: Payment Terms & Acceptance</option>
+          </select>
+
+          <button type="button" class="btn btn-secondary btn-sm" id="btn-save-quote" title="Save this proposal to history">
+            💾 Save
+          </button>
+
+          <div style="display: flex; align-items: center; gap: 0.25rem; background: var(--bg-tertiary); padding: 2px 6px; border-radius: var(--radius-md);">
+            <button type="button" class="btn-row-action" id="btn-zoom-out" title="Zoom Out">−</button>
+            <span id="zoom-level-val" style="font-size: 0.75rem; font-weight: 700; min-width: 38px; text-align: center;">85%</span>
+            <button type="button" class="btn-row-action" id="btn-zoom-in" title="Zoom In">+</button>
+            <button type="button" class="btn-row-action" id="btn-zoom-reset" title="Reset Zoom" style="font-size: 0.7rem; margin-left: 2px;">↺</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scrollable Preview Area -->
+      <div class="preview-scroll-area">
+        <div class="doc-zoom-wrapper" id="doc-zoom-wrapper">
+          <div id="quotation-preview-render">
+            <!-- Dynamic 10-Page Solar Proposal Output -->
+          </div>
+        </div>
+      </div>
+
+    </aside>
+
+  </main>
+
+  <!-- =========================================================================
+       MODAL 1: WHATSAPP SHARING SENDER
+       ========================================================================= -->
+  <div class="modal-backdrop" id="modal-whatsapp">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title" style="color: #25d366;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.04 14.69 2 12.04 2M12.05 3.67C14.25 3.67 16.31 4.53 17.87 6.09C19.42 7.65 20.28 9.72 20.28 11.92C20.28 16.46 16.58 20.15 12.04 20.15C10.56 20.15 9.11 19.76 7.85 19L7.55 18.83L4.43 19.65L5.26 16.61L5.06 16.29C4.24 15 3.8 13.47 3.8 11.91C3.81 7.37 7.5 3.67 12.05 3.67Z"/>
+          </svg>
+          Send Solar Proposal via WhatsApp
+        </div>
+        <button type="button" class="modal-close-btn">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label" for="modal-wa-phone">Recipient WhatsApp Phone Number</label>
+          <input type="tel" id="modal-wa-phone" class="form-control" placeholder="+91 9493858086 (with country code)">
+          <span style="font-size: 0.72rem; color: var(--text-muted);">Include country code for direct chat opening (e.g. +91 for India, +1 for US/CA, +971 for UAE).</span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Auto-Generated WhatsApp Proposal Summary</label>
+          <div class="whatsapp-chat-preview">
+            <div class="chat-bubble" id="modal-wa-preview-text">
+              <!-- Auto generated text -->
+            </div>
+          </div>
+        </div>
+
+        <div class="share-guidance-card">
+          <div style="font-size: 1.2rem;">💡</div>
+          <div>
+            <strong>How WhatsApp sharing works:</strong>
+            <ol style="margin-left: 1.2rem; margin-top: 4px; line-height: 1.4;">
+              <li>Click <strong>Open in WhatsApp</strong> to send the formatted proposal summary with generation, savings & cost breakdown.</li>
+              <li>Click <strong>Download 10-Page PDF</strong> and attach the official PDF directly in your WhatsApp conversation.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-modal-cancel">Close</button>
+        <button type="button" class="btn btn-secondary" id="btn-wa-copy-text">📋 Copy Message</button>
+        <button type="button" class="btn btn-secondary" id="btn-wa-share-native" style="display: none;">📤 Direct Share</button>
+        <button type="button" class="btn btn-whatsapp" id="btn-wa-send-now">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.04 14.69 2 12.04 2M12.05 3.67C14.25 3.67 16.31 4.53 17.87 6.09C19.42 7.65 20.28 9.72 20.28 11.92C20.28 16.46 16.58 20.15 12.04 20.15C10.56 20.15 9.11 19.76 7.85 19L7.55 18.83L4.43 19.65L5.26 16.61L5.06 16.29C4.24 15 3.8 13.47 3.8 11.91C3.81 7.37 7.5 3.67 12.05 3.67Z"/>
+          </svg>
+          Open in WhatsApp
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL 2: DIGITAL SIGNATURE PAD
+       ========================================================================= -->
+  <div class="modal-backdrop" id="modal-signature">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">✍️ Draw Digital Signature</div>
+        <button type="button" class="modal-close-btn">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <p style="font-size: 0.8rem; color: var(--text-secondary);">
+          Draw your signature inside the box using your mouse, trackpad, or finger on mobile:
+        </p>
+        <div class="signature-canvas-wrapper">
+          <canvas id="signature-draw-canvas" class="signature-canvas"></canvas>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" id="btn-clear-sig-canvas">Clear Pad</button>
+        <button type="button" class="btn btn-secondary btn-modal-cancel">Cancel</button>
+        <button type="button" class="btn btn-primary" id="btn-save-sig-canvas">Apply Signature</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL 3: SAVED PROPOSAL HISTORY
+       ========================================================================= -->
+  <div class="modal-backdrop" id="modal-history">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">📂 Saved Solar Proposals History</div>
+        <button type="button" class="modal-close-btn">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div id="history-list-container">
+          <!-- Dynamically Rendered History Cards -->
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-modal-cancel">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL 4: AUTHENTICATION / LOGIN (SALESPERSON & ADMIN)
+       ========================================================================= -->
+  <div class="modal-backdrop" id="modal-admin-login">
+    <div class="modal-content" style="max-width: 440px;">
+      <div class="modal-header">
+        <div class="modal-title" id="auth-modal-title">🔐 QuoteCraft Portal Sign In</div>
+        <button type="button" class="modal-close-btn">&times;</button>
+      </div>
+
+      <form id="form-admin-login">
+        <div class="modal-body">
+          <!-- Role Tabs -->
+          <div class="auth-role-tabs" style="display: flex; gap: 8px; margin-bottom: 14px; background: var(--bg-tertiary); padding: 4px; border-radius: 8px; border: 1px solid var(--border-subtle);">
+            <button type="button" class="auth-tab-btn" id="tab-auth-sales" style="flex: 1; padding: 8px 12px; border: none; border-radius: 6px; font-weight: 700; font-size: 0.82rem; cursor: pointer; background: #10b981; color: white; transition: all 0.2s;">
+              👤 Salesperson
+            </button>
+            <button type="button" class="auth-tab-btn" id="tab-auth-admin" style="flex: 1; padding: 8px 12px; border: none; border-radius: 6px; font-weight: 700; font-size: 0.82rem; cursor: pointer; background: transparent; color: var(--text-secondary); transition: all 0.2s;">
+              🛡️ Administrator
+            </button>
+          </div>
+
+          <div id="auth-hint-box" style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 1rem; line-height: 1.4; background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 6px; padding: 8px 12px;">
+            Please enter your authorized username and password to sign in:
+          </div>
+
+          <div id="admin-login-error" style="display: none; background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 6px; padding: 8px 12px; font-size: 0.8rem; margin-bottom: 12px; font-weight: 600;"></div>
+
+          <div class="form-group" style="margin-bottom: 12px;">
+            <label class="form-label" for="inp-admin-user" id="lbl-auth-user">Username</label>
+            <input type="text" id="inp-admin-user" class="form-control" placeholder="Enter username" required autocomplete="username">
+          </div>
+
+          <div class="form-group" style="margin-bottom: 14px;">
+            <label class="form-label" for="inp-admin-pass">Password</label>
+            <div style="display: flex; gap: 6px; align-items: center;">
+              <input type="password" id="inp-admin-pass" class="form-control" placeholder="Enter password" required autocomplete="current-password" style="flex: 1;">
+              <button type="button" id="btn-toggle-admin-pass-vis" class="btn btn-secondary" style="padding: 6px 10px; font-size: 0.9rem;" title="Show/Hide Password">👁️</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-modal-cancel">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btn-submit-admin-login">
+            <span>🔓 Sign In</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL 5: ADMIN MANAGEMENT DASHBOARD & BACKEND PORTAL
+       ========================================================================= -->
+  <div class="modal-backdrop" id="modal-admin-dashboard">
+    <div class="modal-content" style="max-width: 900px; width: 95%;">
+      <div class="modal-header">
+        <div class="modal-title" style="display: flex; align-items: center; gap: 8px;">
+          <span>🛡️ Company Admin Portal & Sales Hub</span>
+          <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #10b981; font-size: 0.72rem;">ADMIN AUTHENTICATED</span>
+        </div>
+        <button type="button" class="modal-close-btn">&times;</button>
+      </div>
+
+      <div class="modal-body" style="padding-top: 1rem;">
+        <!-- Admin Navigation Tabs -->
+        <div class="admin-tabs-nav">
+          <button type="button" class="admin-tab-btn active" data-target="admin-tab-quotes">
+            <span>📊 All Sales Quotations</span>
+          </button>
+          <button type="button" class="admin-tab-btn" data-target="admin-tab-users">
+            <span>👥 Sales Staff & Accounts</span>
+          </button>
+          <button type="button" class="admin-tab-btn" data-target="admin-tab-config">
+            <span>💳 Master Bank & Company Details</span>
+          </button>
+          <button type="button" class="admin-tab-btn" data-target="admin-tab-stats">
+            <span>📈 Pipeline Analytics</span>
+          </button>
+          <button type="button" class="admin-tab-btn" data-target="admin-tab-cloud">
+            <span>☁️ Cloud DB Sync (GitHub Pages)</span>
+          </button>
+        </div>
+
+        <!-- TAB 1: ALL SALES QUOTATIONS & DAY-WISE REPORTING -->
+        <div class="admin-tab-pane active" id="admin-tab-quotes">
+          <!-- Top Action & Export Header -->
+          <div class="admin-quotes-header-row">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 1.05rem; font-weight: 800; color: #10b981;">📋 Quotation Master Log & Reports</span>
+              <span id="admin-quotes-count" class="badge" style="background: rgba(16, 185, 129, 0.15); color: #10b981; font-weight: 700;">0 Quotes</span>
+            </div>
+
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <a href="/api/reports/daily-excel" class="btn btn-primary btn-sm" id="btn-admin-daily-excel" style="background: linear-gradient(135deg, #059669 0%, #10b981 100%); border-color: #059669; font-weight: 700; display: flex; align-items: center; gap: 5px; text-decoration: none; color: #ffffff;">
+                <span>📊 Download Daily 3-Sheet Excel (.xlsx)</span>
+              </a>
+              <button type="button" class="btn btn-secondary btn-sm" id="btn-admin-export-excel" onclick="window.adminAuth.exportQuotesToExcel()" style="font-weight: 700; display: flex; align-items: center; gap: 5px;">
+                <span>📄 Export CSV</span>
+              </button>
+              <button type="button" class="btn btn-secondary btn-sm" id="btn-admin-print-report" onclick="window.adminAuth.printDayWiseReport()" style="font-weight: 700; display: flex; align-items: center; gap: 5px;">
+                <span>🖨️ Print Report</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Date Range & Search Filter Card -->
+          <div class="admin-filter-card">
+            <!-- Preset Date Filter Buttons -->
+            <div class="admin-date-presets-row">
+              <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Date Filter:</span>
+              <div class="admin-preset-btn-group" id="admin-date-preset-buttons">
+                <button type="button" class="btn-preset active" data-preset="all" onclick="window.adminAuth.setDatePreset('all')">All Time</button>
+                <button type="button" class="btn-preset" data-preset="today" onclick="window.adminAuth.setDatePreset('today')">📅 Today</button>
+                <button type="button" class="btn-preset" data-preset="yesterday" onclick="window.adminAuth.setDatePreset('yesterday')">Yesterday</button>
+                <button type="button" class="btn-preset" data-preset="last7" onclick="window.adminAuth.setDatePreset('last7')">Last 7 Days</button>
+                <button type="button" class="btn-preset" data-preset="thisMonth" onclick="window.adminAuth.setDatePreset('thisMonth')">This Month</button>
+                <button type="button" class="btn-preset" data-preset="custom" onclick="window.adminAuth.setDatePreset('custom')">Custom Range</button>
+              </div>
+            </div>
+
+            <!-- Custom Filters Row -->
+            <div class="admin-filters-grid">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" style="font-size: 0.72rem; margin-bottom: 2px;">Search Text</label>
+                <input type="text" id="inp-search-admin-quotes" class="form-control" placeholder="Search client, phone, quote #, sales rep..." style="font-size: 0.8rem; height: 34px;" oninput="window.adminAuth.handleSearchInput(this.value)">
+              </div>
+
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" style="font-size: 0.72rem; margin-bottom: 2px;">From Date</label>
+                <input type="date" id="inp-filter-date-from" class="form-control" style="font-size: 0.8rem; height: 34px;" onchange="window.adminAuth.handleCustomDateChange()">
+              </div>
+
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" style="font-size: 0.72rem; margin-bottom: 2px;">To Date</label>
+                <input type="date" id="inp-filter-date-to" class="form-control" style="font-size: 0.8rem; height: 34px;" onchange="window.adminAuth.handleCustomDateChange()">
+              </div>
+
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" style="font-size: 0.72rem; margin-bottom: 2px;">Salesperson</label>
+                <select id="sel-filter-sales-rep" class="form-control" style="font-size: 0.8rem; height: 34px;" onchange="window.adminAuth.handleSalesRepChange(this.value)">
+                  <option value="all">👥 All Sales Staff</option>
+                </select>
+              </div>
+
+              <div class="form-group" style="margin-bottom: 0; display: flex; align-items: flex-end;">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="window.adminAuth.resetFilters()" style="height: 34px; width: 100%; font-size: 0.75rem;">
+                  ↺ Reset
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Day-Wise Summary & Metrics Banner -->
+          <div class="admin-summary-metrics-bar" id="admin-summary-metrics-bar">
+            <div class="admin-mini-stat">
+              <span class="admin-mini-stat-label">Total Quotes in Range:</span>
+              <span class="admin-mini-stat-val" id="admin-stat-filtered-quotes">0</span>
+            </div>
+            <div class="admin-mini-stat">
+              <span class="admin-mini-stat-label">Total Capacity:</span>
+              <span class="admin-mini-stat-val" id="admin-stat-filtered-kw" style="color: #38bdf8;">0 kW</span>
+            </div>
+            <div class="admin-mini-stat">
+              <span class="admin-mini-stat-label">Total Value (INR):</span>
+              <span class="admin-mini-stat-val" id="admin-stat-filtered-revenue" style="color: #10b981;">₹0</span>
+            </div>
+          </div>
+
+          <!-- Day-Wise Breakdown Chips -->
+          <div class="admin-daywise-chips-container" id="admin-daywise-chips">
+            <!-- Injected dynamically e.g. "25 Aug: 5 quotes | 24 Aug: 3 quotes" -->
+          </div>
+
+          <!-- Data Table -->
+          <div class="admin-table-wrapper" style="margin-top: 10px;">
+            <table class="admin-data-table">
+              <thead>
+                <tr>
+                  <th style="min-width: 110px;">Date & Time</th>
+                  <th>Quote #</th>
+                  <th>Customer</th>
+                  <th>Capacity</th>
+                  <th>Brand</th>
+                  <th>Project Cost</th>
+                  <th>Salesperson</th>
+                  <th style="text-align: right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="admin-quotes-table-body">
+                <!-- Injected dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- TAB 2: SALES STAFF & USER MANAGEMENT -->
+        <div class="admin-tab-pane" id="admin-tab-users">
+          <!-- Create New Sales Account Form Card -->
+          <div style="background: var(--bg-tertiary); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 1.15rem; margin-bottom: 1.25rem;">
+            <div style="font-size: 0.9rem; font-weight: 800; color: #10b981; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 6px;">
+              <span>➕ Create New Sales Staff Account</span>
+            </div>
+            <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 0.85rem;">
+              Create login credentials for your sales team. When a salesperson logs in, their greeting and name will automatically appear on their quotation drafts.
+            </p>
+
+            <form id="form-create-sales-user" onsubmit="event.preventDefault(); window.adminAuth.handleCreateUserForm(this);">
+              <div class="grid-3">
+                <div class="form-group">
+                  <label class="form-label" for="new-user-username">Sales Username *</label>
+                  <input type="text" id="new-user-username" class="form-control" placeholder="e.g. rahul, priya, sales_hyd" required autocomplete="off">
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="new-user-fullname">Full Name / Display Name *</label>
+                  <input type="text" id="new-user-fullname" class="form-control" placeholder="e.g. Rahul Saw, Priya Sharma" required>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="new-user-password">Login Password *</label>
+                  <input type="password" id="new-user-password" class="form-control" placeholder="Enter password (min 4 chars)" required autocomplete="new-password">
+                </div>
+              </div>
+
+              <div class="grid-3" style="margin-top: 0.5rem;">
+                <div class="form-group">
+                  <label class="form-label" for="new-user-phone">Phone Number (Optional)</label>
+                  <input type="tel" id="new-user-phone" class="form-control" placeholder="e.g. +91 9876543210">
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="new-user-email">Email Address (Optional)</label>
+                  <input type="email" id="new-user-email" class="form-control" placeholder="e.g. rahul@kehansrisolar.com">
+                </div>
+
+                <div class="form-group" style="display: flex; align-items: flex-end;">
+                  <button type="submit" class="btn btn-primary" id="btn-submit-create-user" style="width: 100%; height: 38px; font-weight: 700;">
+                    <span>➕ Create Sales Account</span>
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+
+          <!-- Existing Accounts List -->
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <div style="font-size: 0.88rem; font-weight: 700; color: var(--text-main);">Existing Accounts & Credentials</div>
+            <div id="admin-users-count" style="font-size: 0.75rem; color: #10b981; font-weight: 700;">Loading users...</div>
+          </div>
+
+          <div class="admin-table-wrapper">
+            <table class="admin-data-table">
+              <thead>
+                <tr>
+                  <th>Username</th>
+                  <th>Display Name / Phone</th>
+                  <th>Role</th>
+                  <th>Status</th>
+                  <th>Created</th>
+                  <th style="text-align: right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="admin-users-table-body">
+                <!-- Injected dynamically by loadUsersTable -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- TAB 3: MASTER BANK & COMPANY CONFIG -->
+        <div class="admin-tab-pane" id="admin-tab-config">
+          <form id="form-master-config" onsubmit="event.preventDefault(); window.adminAuth.saveMasterConfigFromForm();">
+            <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 14px;">
+              Configure your <strong>Primary Company Bank</strong> and <strong>2nd Company Bank</strong>. Sales staff can choose between Bank 1 and Bank 2 on their quotations, but cannot edit bank details. Only Administrators can modify these accounts.
+            </p>
+
+            <!-- BANK 1 CARD -->
+            <div style="background: var(--bg-tertiary); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: var(--radius-lg); padding: 1.15rem; margin-bottom: 1.25rem;">
+              <div style="font-size: 0.92rem; font-weight: 800; color: #10b981; margin-bottom: 0.75rem; display: flex; align-items: center; justify-content: space-between;">
+                <span>🏦 Bank Account 1 (Primary Company — e.g. KehanSri Solar)</span>
+                <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #10b981; font-size: 0.7rem;">Primary Bank</span>
+              </div>
+
+              <div class="form-group" style="margin-bottom: 0.75rem;">
+                <label class="form-label" for="adm-bank-label">Bank 1 Display Label / Nickname *</label>
+                <input type="text" id="adm-bank-label" class="form-control" placeholder="e.g. KehanSri Solar (Primary)" required>
+              </div>
+
+              <div class="grid-2">
+                <div class="form-group">
+                  <label class="form-label" for="adm-bank-name">Bank 1 Name *</label>
+                  <input type="text" id="adm-bank-name" class="form-control" placeholder="e.g. ICICI BANK" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="adm-acc-name">Account Holder Name *</label>
+                  <input type="text" id="adm-acc-name" class="form-control" placeholder="e.g. KehanSri Solar" required>
+                </div>
+              </div>
+
+              <div class="grid-2" style="margin-top: 0.5rem;">
+                <div class="form-group">
+                  <label class="form-label" for="adm-acc-number">Bank Account Number *</label>
+                  <input type="text" id="adm-acc-number" class="form-control" placeholder="e.g. 38205006367" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="adm-ifsc">IFSC Code *</label>
+                  <input type="text" id="adm-ifsc" class="form-control" placeholder="e.g. ICIC0000382" required>
+                </div>
+              </div>
+
+              <div class="form-group" style="margin-top: 0.5rem; margin-bottom: 0;">
+                <label class="form-label" for="adm-branch-addr">Branch Address *</label>
+                <input type="text" id="adm-branch-addr" class="form-control" placeholder="e.g. Banjara Hills, Road No 12, Hyderabad: 500034" required>
+              </div>
+            </div>
+
+            <!-- BANK 2 CARD -->
+            <div style="background: var(--bg-tertiary); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: var(--radius-lg); padding: 1.15rem; margin-bottom: 1.25rem;">
+              <div style="font-size: 0.92rem; font-weight: 800; color: #38bdf8; margin-bottom: 0.75rem; display: flex; align-items: center; justify-content: space-between;">
+                <span>🏦 Bank Account 2 (2nd Company / Secondary — e.g. K Energy Solutions)</span>
+                <span class="badge" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; font-size: 0.7rem;">2nd Company Bank</span>
+              </div>
+
+              <div class="form-group" style="margin-bottom: 0.75rem;">
+                <label class="form-label" for="adm-bank2-label">Bank 2 Display Label / Nickname *</label>
+                <input type="text" id="adm-bank2-label" class="form-control" placeholder="e.g. K Energy Solutions (2nd Company)" required>
+              </div>
+
+              <div class="grid-2">
+                <div class="form-group">
+                  <label class="form-label" for="adm-bank2-name">Bank 2 Name *</label>
+                  <input type="text" id="adm-bank2-name" class="form-control" placeholder="e.g. HDFC BANK LTD" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="adm-bank2-acc-name">Account Holder Name *</label>
+                  <input type="text" id="adm-bank2-acc-name" class="form-control" placeholder="e.g. K Energy Solutions" required>
+                </div>
+              </div>
+
+              <div class="grid-2" style="margin-top: 0.5rem;">
+                <div class="form-group">
+                  <label class="form-label" for="adm-bank2-acc-number">Bank Account Number *</label>
+                  <input type="text" id="adm-bank2-acc-number" class="form-control" placeholder="e.g. 50200088991122" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="adm-bank2-ifsc">IFSC Code *</label>
+                  <input type="text" id="adm-bank2-ifsc" class="form-control" placeholder="e.g. HDFC0000456" required>
+                </div>
+              </div>
+
+              <div class="form-group" style="margin-top: 0.5rem; margin-bottom: 0;">
+                <label class="form-label" for="adm-bank2-branch-addr">Branch Address *</label>
+                <input type="text" id="adm-bank2-branch-addr" class="form-control" placeholder="e.g. Gachibowli Main Branch, Hyderabad: 500032" required>
+              </div>
+            </div>
+
+            <!-- COMPANY DETAILS & PASSWORDS CARD -->
+            <div style="background: var(--bg-tertiary); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 1.15rem; margin-bottom: 1.25rem;">
+              <div style="font-size: 0.9rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.75rem;">
+                🏢 Company Legal Details &amp; Master Passwords
+              </div>
+
+              <div class="grid-2">
+                <div class="form-group">
+                  <label class="form-label" for="adm-company-name">Company Legal Name</label>
+                  <input type="text" id="adm-company-name" class="form-control" placeholder="KehanSri Solar">
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="adm-company-phone">Official Phone</label>
+                  <input type="text" id="adm-company-phone" class="form-control" placeholder="+91 9493858086">
+                </div>
+              </div>
+
+              <div class="form-group" style="margin-top: 0.5rem;">
+                <label class="form-label" for="adm-company-addr">Official Office Address</label>
+                <input type="text" id="adm-company-addr" class="form-control" placeholder="Plot 42, Silicon Valley, Hyderabad, Telangana: 500081">
+              </div>
+
+              <div class="grid-2" style="margin-top: 0.75rem;">
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label class="form-label" for="adm-new-sales-pass">Change Default Sales Password (Optional)</label>
+                  <input type="password" id="adm-new-sales-pass" class="form-control" placeholder="Leave blank to keep current password">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label class="form-label" for="adm-new-pass">Change Admin Password (Optional)</label>
+                  <input type="password" id="adm-new-pass" class="form-control" placeholder="Leave blank to keep current password">
+                </div>
+              </div>
+            </div>
+
+            <div style="margin-top: 15px; display: flex; justify-content: flex-end;">
+              <button type="submit" class="btn btn-primary" id="btn-save-master-config" style="padding: 9px 22px; font-weight: 700;">
+                💾 Save Master Bank (1 &amp; 2) &amp; Company Configuration
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- TAB 3: PIPELINE ANALYTICS & STATS -->
+        <div class="admin-tab-pane" id="admin-tab-stats">
+          <!-- 4 Executive KPI Metric Cards -->
+          <div class="admin-stats-grid" id="admin-stats-summary-grid">
+            <div class="admin-stat-card">
+              <div class="admin-stat-label">📋 Total Quotations</div>
+              <div class="admin-stat-val" id="adm-stat-total-quotes">0</div>
+            </div>
+            <div class="admin-stat-card">
+              <div class="admin-stat-label">⚡ Total Proposed Capacity</div>
+              <div class="admin-stat-val" id="adm-stat-total-kw" style="color: #38bdf8;">0 kW</div>
+            </div>
+            <div class="admin-stat-card">
+              <div class="admin-stat-label">💰 Gross Project Pipeline</div>
+              <div class="admin-stat-val" id="adm-stat-total-rev" style="color: #10b981;">₹0</div>
+            </div>
+            <div class="admin-stat-card">
+              <div class="admin-stat-label">💳 Net Customer Pipeline</div>
+              <div class="admin-stat-val" id="adm-stat-net-rev" style="color: #34d399;">₹0</div>
+            </div>
+          </div>
+
+          <!-- 2-Column Analytics: Sales Rep Leaderboard & Brand Distribution -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px;">
+            <!-- Sales Team Leaderboard -->
+            <div style="background: var(--bg-tertiary); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 14px;">
+              <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-main); margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;">
+                <span>🏆 Sales Team Performance</span>
+                <span style="font-size: 0.7rem; color: var(--text-muted);">By Quotation Volume</span>
+              </div>
+              <div id="stat-sales-reps-list" style="display: flex; flex-direction: column; gap: 6px;">
+                <div style="font-size:0.75rem; color:var(--text-muted); padding: 8px 0;">Loading sales team performance...</div>
+              </div>
+            </div>
+
+            <!-- Brand Distribution -->
+            <div style="background: var(--bg-tertiary); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 14px;">
+              <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-main); margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;">
+                <span>☀️ Solar Brands Share</span>
+                <span style="font-size: 0.7rem; color: var(--text-muted);">Proposals by Brand</span>
+              </div>
+              <div id="stat-brands-list" style="display: flex; flex-direction: column; gap: 6px;">
+                <div style="font-size:0.75rem; color:var(--text-muted); padding: 8px 0;">Loading brand analytics...</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Day-Wise Quotation Trend Timeline -->
+          <div style="margin-top: 14px; background: var(--bg-tertiary); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 14px;">
+            <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-main); margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;">
+              <span>📅 Day-Wise Quotation Activity History</span>
+              <span style="font-size: 0.7rem; color: #10b981; font-weight: 700;">Live Breakdown</span>
+            </div>
+            <div id="stat-daily-breakdown-list" style="display: flex; flex-direction: column; gap: 6px;">
+              <div style="font-size:0.75rem; color:var(--text-muted); padding: 8px 0;">Loading daily quotation breakdown...</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 4: CLOUD DATABASE SETUP (GITHUB PAGES) -->
+        <div class="admin-tab-pane" id="admin-tab-cloud">
+          <div style="background: var(--bg-tertiary); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 14px; margin-bottom: 12px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <div style="font-size: 0.88rem; font-weight: 700; color: var(--text-main);">☁️ Free Cloud Database (Real-Time GitHub Pages Sync)</div>
+              <span id="cloud-db-status-badge" class="badge" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; font-weight: 700; font-size: 0.72rem;">Local & Hybrid Active</span>
+            </div>
+            <p style="font-size: 0.78rem; color: var(--text-secondary); line-height: 1.5; margin: 0;">
+              When hosting on <strong>GitHub Pages</strong>, connect a free Supabase database (free 50,000 rows / 1GB) so all salespersons and admin share the exact same quotation database globally in real time.
+            </p>
+          </div>
+
+          <form id="form-cloud-db-config">
+            <div class="form-group" style="margin-bottom: 10px;">
+              <label class="form-label" for="inp-cloud-url">Supabase Project URL</label>
+              <input type="text" id="inp-cloud-url" class="form-control" value="https://bvxyzsmveauqcpbnfgdt.supabase.co" placeholder="https://bvxyzsmveauqcpbnfgdt.supabase.co">
+            </div>
+
+            <div class="form-group" style="margin-bottom: 12px;">
+              <label class="form-label" for="inp-cloud-key">Supabase Public Anon Key (apikey)</label>
+              <input type="password" id="inp-cloud-key" class="form-control" value="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ2eHl6c212ZWF1cWNwYm5mZ2R0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgxODgyOTcsImV4cCI6MjEwMzc2NDI5N30.QuKpVpUgMSghV9ZWuB2b6006MV16-G2EHk0-Th3LDjI" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
+            </div>
+
+            <div style="display: flex; gap: 8px; justify-content: flex-end;">
+              <button type="button" class="btn btn-secondary" id="btn-test-cloud-db" style="font-size: 0.8rem;">
+                🔄 Test Connection
+              </button>
+              <button type="submit" class="btn btn-primary" style="font-size: 0.8rem;">
+                💾 Save Cloud Database Settings
+              </button>
+            </div>
+          </form>
+
+          <div style="margin-top: 14px; background: rgba(0, 0, 0, 0.25); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 12px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <span style="font-size: 0.78rem; font-weight: 700; color: #10b981;">📋 1-Minute Supabase SQL Setup Script:</span>
+              <button type="button" class="btn btn-secondary" id="btn-copy-supabase-sql" style="font-size: 0.7rem; padding: 2px 8px;">Copy SQL</button>
+            </div>
+            <pre style="background: #0f172a; padding: 8px 10px; border-radius: 4px; font-size: 0.7rem; color: #94a3b8; max-height: 140px; overflow-y: auto; margin: 0; font-family: monospace;">-- Run this in Supabase SQL Editor:
+create table if not exists quotes (
+  id text primary key,
+  quote_number text not null,
+  client_name text not null,
+  client_phone text,
+  client_email text,
+  client_address text,
+  kw_capacity numeric not null,
+  partner_brand text not null,
+  structure_type text,
+  total_cost numeric not null,
+  subsidy numeric not null,
+  net_cost numeric not null,
+  sales_rep text,
+  sales_username text default 'SALES',
+  installer_brand text default 'kehansri',
+  status text default 'Generated',
+  quote_json jsonb not null,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+alter table quotes add column if not exists sales_username text default 'SALES';
+alter table quotes add column if not exists installer_brand text default 'kehansri';
+
+create table if not exists company_config (
+  id integer primary key default 1,
+  bank_label text default 'KehanSri Solar (Primary)',
+  bank_name text not null default 'ICICI BANK',
+  account_name text not null default 'KehanSri Solar',
+  account_number text not null default '38205006367',
+  ifsc_code text not null default 'ICIC0000382',
+  branch_address text not null default 'Banjara Hills, Road No 12, Hyderabad: 500034',
+
+  bank2_label text default 'K Energy Solutions (2nd Company)',
+  bank2_name text default 'HDFC BANK LTD',
+  bank2_account_name text default 'K Energy Solutions',
+  bank2_account_number text default '50200088991122',
+  bank2_ifsc_code text default 'HDFC0000456',
+  bank2_branch_address text default 'Gachibowli Main Branch, Hyderabad: 500032',
+
+  company_name text not null default 'KehanSri Solar',
+  company_email text default 'sales@kehansrisolar.com',
+  company_phone text default '+91 9493858086',
+  company_address text default 'Plot 42, Silicon Valley, Hyderabad, Telangana: 500081',
+  sales_username text default 'SALES',
+  updated_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+alter table company_config add column if not exists bank_label text default 'KehanSri Solar (Primary)';
+alter table company_config add column if not exists bank2_label text default 'K Energy Solutions (2nd Company)';
+alter table company_config add column if not exists bank2_name text default 'HDFC BANK LTD';
+alter table company_config add column if not exists bank2_account_name text default 'K Energy Solutions';
+alter table company_config add column if not exists bank2_account_number text default '50200088991122';
+alter table company_config add column if not exists bank2_ifsc_code text default 'HDFC0000456';
+alter table company_config add column if not exists bank2_branch_address text default 'Gachibowli Main Branch, Hyderabad: 500032';
+
+create table if not exists users (
+  id text primary key,
+  username text unique not null,
+  display_name text not null,
+  password_hash text not null,
+  role text default 'sales',
+  phone text,
+  email text,
+  is_active integer default 1,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  updated_at timestamp with time zone default timezone('utc'::text, now())
+);
+
+alter table quotes enable row level security;
+alter table company_config enable row level security;
+alter table users enable row level security;
+
+alter table quotes add column if not exists customer_type text default 'residential';
+alter table quotes add column if not exists system_type text default 'on-grid';
+
+create index if not exists idx_quotes_created_at on quotes(created_at desc);
+create index if not exists idx_quotes_sales_username on quotes(sales_username);
+create index if not exists idx_users_username on users(username);
+
+create policy "Allow all access to quotes" on quotes for all using (true) with check (true);
+create policy "Allow all access to config" on company_config for all using (true) with check (true);
+create policy "Allow all access to users" on users for all using (true) with check (true);</pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer" style="justify-content: space-between;">
+        <button type="button" class="btn btn-secondary" id="btn-admin-logout" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.3);">
+          🔒 Lock & Exit Admin Mode
+        </button>
+        <button type="button" class="btn btn-secondary btn-modal-cancel">Close Portal</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Edit User Account & Credentials -->
+  <div class="modal-backdrop" id="modal-edit-user">
+    <div class="modal-dialog" style="max-width: 540px;">
+      <div class="modal-header">
+        <div class="modal-title">
+          <div class="modal-title-icon" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8;">✏️</div>
+          <div>
+            <div style="font-weight: 800; font-size: 1.05rem;">Edit User Account &amp; Credentials</div>
+            <div style="font-size: 0.75rem; color: var(--text-secondary);" id="lbl-edit-user-subtitle">Update username, password, display name, and permissions</div>
+          </div>
+        </div>
+        <button type="button" class="modal-close-btn" onclick="window.adminAuth.closeEditUserModal()">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <form id="form-edit-user-account" onsubmit="event.preventDefault(); window.adminAuth.handleSaveEditUser(this);">
+          <input type="hidden" id="edit-user-id">
+
+          <div class="grid-2" style="margin-bottom: 0.75rem;">
+            <div class="form-group">
+              <label class="form-label" for="edit-user-username">Username *</label>
+              <input type="text" id="edit-user-username" class="form-control" required autocomplete="off">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="edit-user-role">Account Role *</label>
+              <select id="edit-user-role" class="form-control">
+                <option value="sales">👤 Sales Staff</option>
+                <option value="admin">🛡️ Administrator</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0.75rem;">
+            <label class="form-label" for="edit-user-fullname">Full Display Name *</label>
+            <input type="text" id="edit-user-fullname" class="form-control" required>
+          </div>
+
+          <div class="grid-2" style="margin-bottom: 0.75rem;">
+            <div class="form-group">
+              <label class="form-label" for="edit-user-phone">Phone Number</label>
+              <input type="tel" id="edit-user-phone" class="form-control" placeholder="+91 9876543210">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="edit-user-email">Email Address</label>
+              <input type="email" id="edit-user-email" class="form-control" placeholder="user@kehansrisolar.com">
+            </div>
+          </div>
+
+          <div style="background: rgba(56, 189, 248, 0.08); border: 1px dashed rgba(56, 189, 248, 0.3); border-radius: var(--radius-md); padding: 10px 12px; margin-bottom: 0.75rem;">
+            <div style="font-size: 0.78rem; font-weight: 700; color: #38bdf8; margin-bottom: 4px;">🔑 Change Password (Optional)</div>
+            <div style="font-size: 0.72rem; color: var(--text-secondary); margin-bottom: 8px;">Leave password fields blank if you do not wish to change the password.</div>
+
+            <div class="grid-2">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="edit-user-password" style="font-size: 0.72rem;">New Password</label>
+                <input type="password" id="edit-user-password" class="form-control" placeholder="Min 4 characters" autocomplete="new-password">
+              </div>
+
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="edit-user-confirm-password" style="font-size: 0.72rem;">Confirm Password</label>
+                <input type="password" id="edit-user-confirm-password" class="form-control" placeholder="Re-enter password" autocomplete="new-password">
+              </div>
+            </div>
+          </div>
+
+          <div id="edit-user-error" style="display: none; padding: 8px 12px; background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; border-radius: 6px; color: #f87171; font-size: 0.78rem; margin-bottom: 10px;"></div>
+
+          <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 1rem;">
+            <button type="button" class="btn btn-secondary" onclick="window.adminAuth.closeEditUserModal()">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="btn-save-edit-user">
+              <span>💾 Save User Changes</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  </div> <!-- /#app-main-workspace -->
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container"></div>
+
+  <!-- Application Scripts -->
+  <script src="js/sample-data.js?v=5.0"></script>
+  <script src="js/calculator.js?v=5.0"></script>
+  <script src="js/solar-calculator.js?v=5.0"></script>
+  <script src="js/state.js?v=5.0"></script>
+  <script src="js/map-engine.js?v=5.0"></script>
+  <script src="js/solar-templates.js?v=5.0"></script>
+  <script src="js/templates.js?v=5.0"></script>
+  <script src="js/signature.js?v=5.0"></script>
+  <script src="js/whatsapp.js?v=5.0"></script>
+  <script src="js/pdf-export.js?v=5.0"></script>
+  <script src="js/cloud-db.js?v=5.0"></script>
+  <script src="js/admin-auth.js?v=5.0"></script>
+  <script src="js/app.js?v=5.0"></script>
+</body>
+</html>

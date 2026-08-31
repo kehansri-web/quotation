@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 240" width="500" height="240">
+  <g transform="skewX(-14)">
+    <text x="255" y="125" text-anchor="middle" font-family="'Plus Jakarta Sans', Impact, sans-serif" font-weight="900" font-size="105" fill="#22b14c" letter-spacing="1">WAAREE</text>
+    <circle cx="435" cy="48" r="12" fill="none" stroke="#22b14c" stroke-width="3" />
+    <text x="435" y="52" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="bold" fill="#22b14c">R</text>
+  </g>
+  <text x="250" y="195" text-anchor="middle" font-family="'Plus Jakarta Sans', Georgia, serif" font-style="italic" font-weight="700" font-size="44" fill="#c1272d" letter-spacing="0.5">One with the Sun</text>
+</svg>
