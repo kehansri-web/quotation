@@ -1655,8 +1655,227 @@ create policy "Allow all access to users" on users for all using (true) with che
   }
 
   // =========================================================================
-  // EXCEL / CSV DATA EXPORT ENGINE
+  // EXCEL / CSV DATA EXPORT ENGINE (CLIENT-SIDE MULTI-SHEET EXCEL & CSV)
   // =========================================================================
+
+  async downloadDaily3SheetExcel() {
+    const btn = document.getElementById("btn-admin-daily-excel");
+    const origHtml = btn ? btn.innerHTML : "";
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = "<span>⏳ Generating 3-Sheet Excel...</span>";
+    }
+
+    try {
+      let quotes = this.cachedQuotesList;
+      if (!quotes || quotes.length === 0) {
+        if (window.cloudDb) {
+          const res = await window.cloudDb.fetchQuotes(this.quoteFilters, this.token);
+          quotes = (res && res.quotes) ? res.quotes : window.cloudDb.getLocalQuotes();
+        }
+      }
+
+      if (!quotes || quotes.length === 0) {
+        if (typeof app !== "undefined" && typeof app.showToast === "function") {
+          app.showToast("No quotations found for current date/filters to generate Excel report!", "warning");
+        } else {
+          alert("No quotations found to export.");
+        }
+        return;
+      }
+
+      // 1. If SheetJS (XLSX) is available in browser
+      if (typeof XLSX !== "undefined") {
+        const wb = XLSX.utils.book_new();
+
+        // -------------------------------------------------------------
+        // SHEET 1: EXECUTIVE KPI DASHBOARD
+        // -------------------------------------------------------------
+        const totalQuotes = quotes.length;
+        const totalKw = quotes.reduce((acc, q) => acc + (parseFloat(q.kw_capacity || q.kwCapacity || 0) || 0), 0);
+        const totalGross = quotes.reduce((acc, q) => acc + (parseFloat(q.total_cost || q.totalCost || 0) || 0), 0);
+        const totalSubsidy = quotes.reduce((acc, q) => acc + (parseFloat(q.subsidy || 0) || 0), 0);
+        const totalNet = quotes.reduce((acc, q) => acc + (parseFloat(q.net_cost || q.netCost || 0) || Math.max(0, (q.total_cost || 0) - (q.subsidy || 0))), 0);
+        const avgKw = totalQuotes > 0 ? (totalKw / totalQuotes) : 0;
+
+        let resCount = 0, resKw = 0, resVal = 0;
+        let cniCount = 0, cniKw = 0, cniVal = 0;
+        const brandMap = {};
+        const sysMap = {};
+
+        quotes.forEach(q => {
+          let parsed = null;
+          try { parsed = typeof q.quote_json === 'string' ? JSON.parse(q.quote_json) : q.quote_json; } catch(e) {}
+          const cType = q.customer_type || parsed?.solar?.customerType || 'residential';
+          const kw = parseFloat(q.kw_capacity || parsed?.solar?.kwCapacity || 0) || 0;
+          const cost = parseFloat(q.total_cost || parsed?.solar?.customSystemCost || 0) || 0;
+          if (cType.toLowerCase() === 'cni' || cType.toLowerCase() === 'commercial') {
+            cniCount++; cniKw += kw; cniVal += cost;
+          } else {
+            resCount++; resKw += kw; resVal += cost;
+          }
+
+          let br = q.partner_brand || parsed?.solar?.partnerBrand || 'Adani';
+          br = br.charAt(0).toUpperCase() + br.slice(1);
+          brandMap[br] = (brandMap[br] || 0) + 1;
+
+          let st = q.system_type || parsed?.solar?.systemType || 'On-Grid';
+          st = st.charAt(0).toUpperCase() + st.slice(1);
+          sysMap[st] = (sysMap[st] || 0) + 1;
+        });
+
+        const dashboardData = [
+          ["QuoteCraft Pro - Executive Solar Quotation & Operations Report"],
+          ["Generated Date & Time:", new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }) + " (IST)"],
+          ["Filtered Range:", (this.quoteFilters.startDate || "All Time") + " to " + (this.quoteFilters.endDate || "Present")],
+          [],
+          ["📊 EXECUTIVE PORTFOLIO SUMMARY"],
+          ["Metric", "Value", "Notes / Unit"],
+          ["Total Proposals Generated", totalQuotes, "Proposals"],
+          ["Total Solar Capacity", Math.round(totalKw * 10) / 10, "kW"],
+          ["Gross Project Pipeline Value", totalGross, "INR (₹)"],
+          ["Total Subsidies (PM Surya Ghar)", totalSubsidy, "INR (₹)"],
+          ["Net Customer Payable Value", totalNet, "INR (₹)"],
+          ["Average Project Capacity", Math.round(avgKw * 10) / 10, "kW / Proposal"],
+          [],
+          ["🏡 SECTOR BREAKDOWN (Residential vs Commercial & Industrial)"],
+          ["Sector", "Count", "Total Capacity (kW)", "Gross Value (INR ₹)"],
+          ["Residential Solar (PM Surya Ghar)", resCount, Math.round(resKw * 10) / 10, resVal],
+          ["Commercial & Industrial (C&I Tax Shield)", cniCount, Math.round(cniKw * 10) / 10, cniVal],
+          [],
+          ["⚡ SYSTEM TYPE DISTRIBUTION"],
+          ["System Architecture", "Proposal Count"],
+          ...Object.entries(sysMap).map(([type, count]) => [type, count]),
+          [],
+          ["🏭 OEM PARTNER BRAND DISTRIBUTION"],
+          ["Solar PV Brand", "Proposal Count"],
+          ...Object.entries(brandMap).map(([brand, count]) => [brand, count])
+        ];
+
+        const wsDashboard = XLSX.utils.aoa_to_sheet(dashboardData);
+        wsDashboard["!cols"] = [{ wch: 38 }, { wch: 24 }, { wch: 28 }, { wch: 22 }];
+        XLSX.utils.book_append_sheet(wb, wsDashboard, "Executive Dashboard");
+
+        // -------------------------------------------------------------
+        // SHEET 2: COMPREHENSIVE QUOTATION LEDGER
+        // -------------------------------------------------------------
+        const ledgerHeaders = [
+          "Date (IST)", "Time (IST)", "Quote #", "Customer Name", "Phone", "Email",
+          "Project / Billing Address", "Sector", "System Type", "Capacity (kW)",
+          "OEM Panel Brand", "Structure Type", "Gross Value (INR ₹)",
+          "Govt Subsidy (INR ₹)", "Net Payable (INR ₹)", "Sales Representative",
+          "Sales Username", "Installer Brand", "Status"
+        ];
+
+        const ledgerRows = [ledgerHeaders];
+        quotes.forEach(q => {
+          let parsed = null;
+          try { parsed = typeof q.quote_json === 'string' ? JSON.parse(q.quote_json) : q.quote_json; } catch(e) {}
+          const rawTimestamp = q.created_at || q.createdAt || parsed?.createdAt || "";
+          const dateVal = this.formatDateDisplay(rawTimestamp);
+          const timeVal = this.formatTimeDisplay(rawTimestamp);
+
+          const quoteNum = q.quote_number || q.id || "";
+          const clientName = q.client_name || parsed?.client?.name || "";
+          const clientPhone = q.client_phone || parsed?.client?.phone || "";
+          const clientEmail = q.client_email || parsed?.client?.email || "";
+          const clientAddress = q.client_address || parsed?.client?.billingAddress || "";
+          const sector = (q.customer_type || parsed?.solar?.customerType || "residential").toUpperCase();
+          const sysType = (q.system_type || parsed?.solar?.systemType || "on-grid").toUpperCase();
+          const kw = parseFloat(q.kw_capacity || parsed?.solar?.kwCapacity || 0) || 0;
+          const brand = q.partner_brand || parsed?.solar?.partnerBrand || "Adani";
+          const structure = q.structure_type || parsed?.solar?.structureType || "Elevated";
+          const totalCost = Number(q.total_cost || parsed?.solar?.customSystemCost || (kw * 55000));
+          const subsidy = Number(q.subsidy || parsed?.solar?.customSubsidy || 0);
+          const netCost = Number(q.net_cost || Math.max(0, totalCost - subsidy));
+          const salesRep = q.sales_rep || parsed?.business?.preparedByName || "Sales Rep";
+          const salesUser = q.sales_username || parsed?.business?.salesUsername || "SALES";
+          const instBrand = (q.installer_brand === "kenergy" ? "K Energy Solutions" : "KehanSri Solar");
+          const status = q.status || "Generated";
+
+          ledgerRows.push([
+            dateVal, timeVal, quoteNum, clientName, clientPhone, clientEmail,
+            clientAddress, sector, sysType, kw, brand, structure, totalCost,
+            subsidy, netCost, salesRep, salesUser, instBrand, status
+          ]);
+        });
+
+        const wsLedger = XLSX.utils.aoa_to_sheet(ledgerRows);
+        wsLedger["!cols"] = [
+          { wch: 14 }, { wch: 12 }, { wch: 16 }, { wch: 24 }, { wch: 16 }, { wch: 24 },
+          { wch: 32 }, { wch: 14 }, { wch: 14 }, { wch: 14 }, { wch: 16 }, { wch: 20 },
+          { wch: 18 }, { wch: 18 }, { wch: 18 }, { wch: 20 }, { wch: 14 }, { wch: 20 }, { wch: 12 }
+        ];
+        XLSX.utils.book_append_sheet(wb, wsLedger, "Quotations Ledger");
+
+        // -------------------------------------------------------------
+        // SHEET 3: SALES STAFF LEADERBOARD
+        // -------------------------------------------------------------
+        const repsData = {};
+        quotes.forEach(q => {
+          let parsed = null;
+          try { parsed = typeof q.quote_json === 'string' ? JSON.parse(q.quote_json) : q.quote_json; } catch(e) {}
+          const repName = q.sales_rep || parsed?.business?.preparedByName || "Direct / Admin";
+          const repUser = q.sales_username || parsed?.business?.salesUsername || "SALES";
+          const kw = parseFloat(q.kw_capacity || parsed?.solar?.kwCapacity || 0) || 0;
+          const cost = parseFloat(q.total_cost || parsed?.solar?.customSystemCost || 0) || 0;
+          const net = parseFloat(q.net_cost || Math.max(0, cost - (q.subsidy || 0))) || 0;
+
+          if (!repsData[repName]) {
+            repsData[repName] = { name: repName, username: repUser, count: 0, kw: 0, gross: 0, net: 0 };
+          }
+          repsData[repName].count += 1;
+          repsData[repName].kw += kw;
+          repsData[repName].gross += cost;
+          repsData[repName].net += net;
+        });
+
+        const leaderboardSorted = Object.values(repsData).sort((a, b) => b.kw - a.kw);
+        const leaderboardRows = [
+          ["QuoteCraft Pro - Sales Staff Performance Leaderboard"],
+          ["Rank", "Sales Representative", "Username", "Proposals Generated", "Total Solar kW", "Gross Pipeline (INR ₹)", "Net Realized (INR ₹)", "Avg Deal Size (kW)"]
+        ];
+
+        leaderboardSorted.forEach((r, idx) => {
+          leaderboardRows.push([
+            idx + 1,
+            r.name,
+            r.username,
+            r.count,
+            Math.round(r.kw * 10) / 10,
+            r.gross,
+            r.net,
+            Math.round((r.kw / r.count) * 10) / 10
+          ]);
+        });
+
+        const wsLeaderboard = XLSX.utils.aoa_to_sheet(leaderboardRows);
+        wsLeaderboard["!cols"] = [
+          { wch: 8 }, { wch: 24 }, { wch: 14 }, { wch: 20 }, { wch: 16 }, { wch: 22 }, { wch: 22 }, { wch: 18 }
+        ];
+        XLSX.utils.book_append_sheet(wb, wsLeaderboard, "Sales Leaderboard");
+
+        // Write and download .xlsx file
+        const todayStr = new Date().toISOString().split("T")[0];
+        const filename = `QuoteCraft_Daily_Solar_Report_${todayStr}.xlsx`;
+        XLSX.writeFile(wb, filename);
+
+        if (typeof app !== "undefined" && typeof app.showToast === "function") {
+          app.showToast(`📊 Successfully downloaded 3-Sheet Excel Workbook (${totalQuotes} quotes)!`, "success");
+        }
+      } else {
+        await this.exportQuotesToExcel();
+      }
+    } catch (err) {
+      console.error("Excel download error:", err);
+      await this.exportQuotesToExcel();
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = origHtml;
+      }
+    }
+  }
 
   async exportQuotesToExcel() {
     let quotes = this.cachedQuotesList;

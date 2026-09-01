@@ -191,10 +191,11 @@
     }
   </style>
 
-  <!-- PDF & Canvas Generation CDN Scripts -->
+  <!-- PDF & Excel Generation CDN Scripts -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
 
@@ -1346,9 +1347,9 @@
               <button type="button" class="btn btn-secondary btn-sm" id="btn-admin-sync-cloud" onclick="window.adminAuth.syncLocalQuotesToCloud()" style="font-weight: 700; color: #38bdf8; border-color: rgba(56, 189, 248, 0.4); display: flex; align-items: center; gap: 5px;">
                 <span>☁️ Sync Local Quotes to Cloud</span>
               </button>
-              <a href="/api/reports/daily-excel" class="btn btn-primary btn-sm" id="btn-admin-daily-excel" style="background: linear-gradient(135deg, #059669 0%, #10b981 100%); border-color: #059669; font-weight: 700; display: flex; align-items: center; gap: 5px; text-decoration: none; color: #ffffff;">
+              <button type="button" class="btn btn-primary btn-sm" id="btn-admin-daily-excel" onclick="window.adminAuth.downloadDaily3SheetExcel()" style="background: linear-gradient(135deg, #059669 0%, #10b981 100%); border-color: #059669; font-weight: 700; display: flex; align-items: center; gap: 5px; color: #ffffff;">
                 <span>📊 Download Daily 3-Sheet Excel (.xlsx)</span>
-              </a>
+              </button>
               <button type="button" class="btn btn-secondary btn-sm" id="btn-admin-export-excel" onclick="window.adminAuth.exportQuotesToExcel()" style="font-weight: 700; display: flex; align-items: center; gap: 5px;">
                 <span>📄 Export CSV</span>
               </button>
@@ -1931,18 +1932,18 @@ create policy "Allow all access to users" on users for all using (true) with che
   <div class="toast-container"></div>
 
   <!-- Application Scripts -->
-  <script src="js/sample-data.js?v=6.0"></script>
-  <script src="js/calculator.js?v=6.0"></script>
-  <script src="js/solar-calculator.js?v=6.0"></script>
-  <script src="js/state.js?v=6.0"></script>
-  <script src="js/map-engine.js?v=6.0"></script>
-  <script src="js/solar-templates.js?v=6.0"></script>
-  <script src="js/templates.js?v=6.0"></script>
-  <script src="js/signature.js?v=6.0"></script>
-  <script src="js/whatsapp.js?v=6.0"></script>
-  <script src="js/pdf-export.js?v=6.0"></script>
-  <script src="js/cloud-db.js?v=6.0"></script>
-  <script src="js/admin-auth.js?v=6.0"></script>
-  <script src="js/app.js?v=6.0"></script>
+  <script src="js/sample-data.js?v=7.0"></script>
+  <script src="js/calculator.js?v=7.0"></script>
+  <script src="js/solar-calculator.js?v=7.0"></script>
+  <script src="js/state.js?v=7.0"></script>
+  <script src="js/map-engine.js?v=7.0"></script>
+  <script src="js/solar-templates.js?v=7.0"></script>
+  <script src="js/templates.js?v=7.0"></script>
+  <script src="js/signature.js?v=7.0"></script>
+  <script src="js/whatsapp.js?v=7.0"></script>
+  <script src="js/pdf-export.js?v=7.0"></script>
+  <script src="js/cloud-db.js?v=7.0"></script>
+  <script src="js/admin-auth.js?v=7.0"></script>
+  <script src="js/app.js?v=7.0"></script>
 </body>
 </html>
