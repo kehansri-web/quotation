@@ -2,9 +2,9 @@ name: Daily 08:00 PM IST Solar Quotation Report
 
 on:
   schedule:
-    # 14:30 UTC = 20:00 IST (08:00 PM Indian Standard Time)
+    # 14:30 UTC corresponds to 20:00 IST (08:00 PM Indian Standard Time)
     - cron: '30 14 * * *'
-  workflow_dispatch:
+  workflow_dispatch: # Allows manual trigger anytime from Actions tab
 
 permissions:
   contents: read
@@ -27,7 +27,7 @@ jobs:
       - name: Install Python Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install openpyxl requests
+          pip install -r requirements.txt
 
       - name: Run Daily Report Generator & Email Dispatcher
         env:
@@ -51,3 +51,4 @@ jobs:
           name: daily-solar-excel-reports
           path: reports/*.xlsx
           retention-days: 30
+          if-no-files-found: ignore
