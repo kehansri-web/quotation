@@ -100,15 +100,22 @@ class AdminAuthManager {
 
     // Default Master Config
     const fallbackConfig = {
+      bank_label: "KehanSri Solar (Primary)",
       bank_name: "ICICI BANK",
       account_name: "KehanSri Solar",
       account_number: "38205006367",
       ifsc_code: "ICIC0000382",
       branch_address: "Banjara Hills, Road No 12, Hyderabad: 500034",
+      bank2_label: "Kehansri Energy (2nd Company)",
+      bank2_name: "ICICI BANK LIMITED",
+      bank2_account_name: "Kehansri  Energy (OPC) Solutions",
+      bank2_account_number: "038205006367",
+      bank2_ifsc_code: "ICIC0000382",
+      bank2_branch_address: "BANJARA  HILLS",
       company_name: "KehanSri Solar",
       company_email: "sales@kehansrisolar.com",
       company_phone: "+91 9493858086",
-      company_address: "Plot 42, Silicon Valley, Hyderabad, Telangana: 500081",
+      company_address: "Street- 19, Sri Shyam Nagar, Telecom Nagar, Gachibowli, Hyderabad, Telangana: 500081",
       sales_username: "SALES"
     };
     this.applyConfigToState(fallbackConfig);
@@ -132,12 +139,12 @@ class AdminAuthManager {
     };
 
     const bank2 = {
-      label: cfg.bank2_label || cfg.bank2Label || "K Energy Solutions (2nd Company)",
-      bankName: cfg.bank2_name || cfg.bank2Name || "HDFC BANK LTD",
-      accountName: cfg.bank2_account_name || cfg.bank2AccountName || "K Energy Solutions",
-      accountNumber: cfg.bank2_account_number || cfg.bank2AccountNumber || "50200088991122",
-      routingOrIfsc: cfg.bank2_ifsc_code || cfg.bank2RoutingOrIfsc || cfg.bank2Ifsc || "HDFC0000456",
-      notes: cfg.bank2_branch_address || cfg.bank2BranchAddress || cfg.bank2Notes || "Gachibowli Main Branch, Hyderabad: 500032"
+      label: cfg.bank2_label || cfg.bank2Label || "Kehansri Energy (2nd Company)",
+      bankName: cfg.bank2_name || cfg.bank2Name || "ICICI BANK LIMITED",
+      accountName: cfg.bank2_account_name || cfg.bank2AccountName || "Kehansri  Energy (OPC) Solutions",
+      accountNumber: cfg.bank2_account_number || cfg.bank2AccountNumber || "038205006367",
+      routingOrIfsc: cfg.bank2_ifsc_code || cfg.bank2RoutingOrIfsc || cfg.bank2Ifsc || "ICIC0000382",
+      notes: cfg.bank2_branch_address || cfg.bank2BranchAddress || cfg.bank2Notes || "BANJARA  HILLS"
     };
 
     if (typeof state !== "undefined") {
@@ -300,13 +307,18 @@ class AdminAuthManager {
         localStorage.setItem("quotecraft_auth_user", this.username);
         localStorage.setItem("quotecraft_auth_display", this.displayName);
 
-        // Load the draft for this specific user or start fresh
+        // Always fetch fresh company config and load user draft
+        await this.fetchCompanyConfig();
+
         if (typeof state !== "undefined") {
           const draft = state.loadDraft();
           if (draft) {
             state.currentQuote = draft;
           } else {
             state.resetToNew();
+          }
+          if (this.companyConfig) {
+            this.applyConfigToState(this.companyConfig);
           }
           state.updateBusiness({
             preparedByName: this.displayName || this.username,
@@ -317,6 +329,9 @@ class AdminAuthManager {
           if (window.quoteApp) {
             window.quoteApp.renderFormFromState();
             window.quoteApp.renderItemsTable();
+            if (typeof window.quoteApp.renderPreview === "function") {
+              window.quoteApp.renderPreview();
+            }
           }
         }
 
@@ -347,12 +362,18 @@ class AdminAuthManager {
         localStorage.setItem("quotecraft_auth_user", this.username);
         localStorage.setItem("quotecraft_auth_display", this.displayName);
 
+        // Always fetch fresh company config and load user draft
+        await this.fetchCompanyConfig();
+
         if (typeof state !== "undefined") {
           const draft = state.loadDraft();
           if (draft) {
             state.currentQuote = draft;
           } else {
             state.resetToNew();
+          }
+          if (this.companyConfig) {
+            this.applyConfigToState(this.companyConfig);
           }
           state.updateBusiness({
             preparedByName: this.displayName || this.username,
@@ -363,6 +384,9 @@ class AdminAuthManager {
           if (window.quoteApp) {
             window.quoteApp.renderFormFromState();
             window.quoteApp.renderItemsTable();
+            if (typeof window.quoteApp.renderPreview === "function") {
+              window.quoteApp.renderPreview();
+            }
           }
         }
 

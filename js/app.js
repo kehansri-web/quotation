@@ -98,6 +98,9 @@ class QuotationApp {
     this.bindLogoEnhancer();
     this.bindModals();
     this.bindCatalog();
+    if (window.adminAuth && window.adminAuth.companyConfig) {
+      window.adminAuth.applyConfigToState(window.adminAuth.companyConfig);
+    }
     this.renderFormFromState();
     this.renderItemsTable();
     this.renderLivePreview();
@@ -861,22 +864,24 @@ class QuotationApp {
       const p = q.paymentDetails || {};
       let bankData = null;
 
+      const masterCfg = window.adminAuth?.companyConfig;
+
       if (choice === "bank2") {
-        bankData = p.bank2 || (window.adminAuth?.companyConfig ? {
-          bankName: window.adminAuth.companyConfig.bank2_name || window.adminAuth.companyConfig.bank2Name || "HDFC BANK LTD",
-          accountName: window.adminAuth.companyConfig.bank2_account_name || window.adminAuth.companyConfig.bank2AccountName || "K Energy Solutions",
-          accountNumber: window.adminAuth.companyConfig.bank2_account_number || window.adminAuth.companyConfig.bank2AccountNumber || "50200088991122",
-          routingOrIfsc: window.adminAuth.companyConfig.bank2_ifsc_code || window.adminAuth.companyConfig.bank2RoutingOrIfsc || "HDFC0000456",
-          notes: window.adminAuth.companyConfig.bank2_branch_address || window.adminAuth.companyConfig.bank2Notes || "Gachibowli Main Branch, Hyderabad: 500032"
-        } : null);
+        bankData = masterCfg ? {
+          bankName: masterCfg.bank2_name || masterCfg.bank2Name || "ICICI BANK LIMITED",
+          accountName: masterCfg.bank2_account_name || masterCfg.bank2AccountName || "Kehansri  Energy (OPC) Solutions",
+          accountNumber: masterCfg.bank2_account_number || masterCfg.bank2AccountNumber || "038205006367",
+          routingOrIfsc: masterCfg.bank2_ifsc_code || masterCfg.bank2RoutingOrIfsc || "ICIC0000382",
+          notes: masterCfg.bank2_branch_address || masterCfg.bank2BranchAddress || "BANJARA  HILLS"
+        } : (p.bank2 || null);
       } else {
-        bankData = p.bank1 || (window.adminAuth?.companyConfig ? {
-          bankName: window.adminAuth.companyConfig.bank_name || window.adminAuth.companyConfig.bankName || "ICICI BANK",
-          accountName: window.adminAuth.companyConfig.account_name || window.adminAuth.companyConfig.accountName || "KehanSri Solar",
-          accountNumber: window.adminAuth.companyConfig.account_number || window.adminAuth.companyConfig.accountNumber || "38205006367",
-          routingOrIfsc: window.adminAuth.companyConfig.ifsc_code || window.adminAuth.companyConfig.routingOrIfsc || "ICIC0000382",
-          notes: window.adminAuth.companyConfig.branch_address || window.adminAuth.companyConfig.notes || "Banjara Hills, Road No 12, Hyderabad: 500034"
-        } : null);
+        bankData = masterCfg ? {
+          bankName: masterCfg.bank_name || masterCfg.bankName || "ICICI BANK",
+          accountName: masterCfg.account_name || masterCfg.accountName || "KehanSri Solar",
+          accountNumber: masterCfg.account_number || masterCfg.accountNumber || "38205006367",
+          routingOrIfsc: masterCfg.ifsc_code || masterCfg.routingOrIfsc || "ICIC0000382",
+          notes: masterCfg.branch_address || masterCfg.branchAddress || "Banjara Hills, Road No 12, Hyderabad: 500034"
+        } : (p.bank1 || null);
       }
 
       if (bankData) {

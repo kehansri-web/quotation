@@ -219,7 +219,43 @@ class AppStateManager {
   loadDraft() {
     try {
       const saved = localStorage.getItem(this.getDraftStorageKey());
-      return saved ? JSON.parse(saved) : null;
+      if (!saved) return null;
+      const parsed = JSON.parse(saved);
+      if (parsed && window.adminAuth && window.adminAuth.companyConfig) {
+        const cfg = window.adminAuth.companyConfig;
+        if (!parsed.paymentDetails) parsed.paymentDetails = {};
+        const isB2 = parsed.paymentDetails.selectedBank === "bank2";
+        const b1 = {
+          label: cfg.bank_label || cfg.bankLabel || "KehanSri Solar (Primary)",
+          bankName: cfg.bank_name || cfg.bankName || "ICICI BANK",
+          accountName: cfg.account_name || cfg.accountName || "KehanSri Solar",
+          accountNumber: cfg.account_number || cfg.accountNumber || "38205006367",
+          routingOrIfsc: cfg.ifsc_code || cfg.routingOrIfsc || "ICIC0000382",
+          notes: cfg.branch_address || cfg.notes || cfg.branchAddress || "Banjara Hills, Road No 12, Hyderabad: 500034"
+        };
+        const b2 = {
+          label: cfg.bank2_label || cfg.bank2Label || "Kehansri Energy (2nd Company)",
+          bankName: cfg.bank2_name || cfg.bank2Name || "ICICI BANK LIMITED",
+          accountName: cfg.bank2_account_name || cfg.bank2AccountName || "Kehansri  Energy (OPC) Solutions",
+          accountNumber: cfg.bank2_account_number || cfg.bank2AccountNumber || "038205006367",
+          routingOrIfsc: cfg.bank2_ifsc_code || cfg.bank2RoutingOrIfsc || "ICIC0000382",
+          notes: cfg.bank2_branch_address || cfg.bank2BranchAddress || "BANJARA  HILLS"
+        };
+        parsed.paymentDetails.bank1 = b1;
+        parsed.paymentDetails.bank2 = b2;
+        const active = isB2 ? b2 : b1;
+        parsed.paymentDetails.bankName = active.bankName;
+        parsed.paymentDetails.accountName = active.accountName;
+        parsed.paymentDetails.accountNumber = active.accountNumber;
+        parsed.paymentDetails.routingOrIfsc = active.routingOrIfsc;
+        parsed.paymentDetails.notes = active.notes;
+
+        if (cfg.company_address || cfg.companyAddress) {
+          if (!parsed.business) parsed.business = {};
+          parsed.business.address = cfg.company_address || cfg.companyAddress;
+        }
+      }
+      return parsed;
     } catch (e) {
       return null;
     }
@@ -309,6 +345,9 @@ class AppStateManager {
       shippingAddress: ""
     };
     this.currentQuote = newQuote;
+    if (window.adminAuth && window.adminAuth.companyConfig) {
+      window.adminAuth.applyConfigToState(window.adminAuth.companyConfig);
+    }
     this.notify();
   }
 }

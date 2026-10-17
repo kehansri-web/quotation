@@ -47,30 +47,30 @@ CREATE TABLE IF NOT EXISTS company_config (
   branch_address TEXT NOT NULL DEFAULT 'Banjara Hills, Road No 12, Hyderabad: 500034',
 
   -- Bank 2 (2nd Company Account)
-  bank2_label TEXT DEFAULT 'K Energy Solutions (2nd Company)',
-  bank2_name TEXT DEFAULT 'HDFC BANK LTD',
-  bank2_account_name TEXT DEFAULT 'K Energy Solutions',
-  bank2_account_number TEXT DEFAULT '50200088991122',
-  bank2_ifsc_code TEXT DEFAULT 'HDFC0000456',
-  bank2_branch_address TEXT DEFAULT 'Gachibowli Main Branch, Hyderabad: 500032',
+  bank2_label TEXT DEFAULT 'Kehansri Energy (2nd Company)',
+  bank2_name TEXT DEFAULT 'ICICI BANK LIMITED',
+  bank2_account_name TEXT DEFAULT 'Kehansri  Energy (OPC) Solutions',
+  bank2_account_number TEXT DEFAULT '038205006367',
+  bank2_ifsc_code TEXT DEFAULT 'ICIC0000382',
+  bank2_branch_address TEXT DEFAULT 'BANJARA  HILLS',
 
   -- Company Details
   company_name TEXT NOT NULL DEFAULT 'KehanSri Solar',
   company_email TEXT DEFAULT 'sales@kehansrisolar.com',
   company_phone TEXT DEFAULT '+91 9493858086',
-  company_address TEXT DEFAULT 'Plot 42, Silicon Valley, Hyderabad, Telangana: 500081',
+  company_address TEXT DEFAULT 'Street- 19, Sri Shyam Nagar, Telecom Nagar, Gachibowli, Hyderabad, Telangana: 500081',
   sales_username TEXT DEFAULT 'SALES',
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::TEXT, NOW()) NOT NULL
 );
 
 -- Safe migrations for existing company_config table
 ALTER TABLE company_config ADD COLUMN IF NOT EXISTS bank_label TEXT DEFAULT 'KehanSri Solar (Primary)';
-ALTER TABLE company_config ADD COLUMN IF NOT EXISTS bank2_label TEXT DEFAULT 'K Energy Solutions (2nd Company)';
-ALTER TABLE company_config ADD COLUMN IF NOT EXISTS bank2_name TEXT DEFAULT 'HDFC BANK LTD';
-ALTER TABLE company_config ADD COLUMN IF NOT EXISTS bank2_account_name TEXT DEFAULT 'K Energy Solutions';
-ALTER TABLE company_config ADD COLUMN IF NOT EXISTS bank2_account_number TEXT DEFAULT '50200088991122';
-ALTER TABLE company_config ADD COLUMN IF NOT EXISTS bank2_ifsc_code TEXT DEFAULT 'HDFC0000456';
-ALTER TABLE company_config ADD COLUMN IF NOT EXISTS bank2_branch_address TEXT DEFAULT 'Gachibowli Main Branch, Hyderabad: 500032';
+ALTER TABLE company_config ADD COLUMN IF NOT EXISTS bank2_label TEXT DEFAULT 'Kehansri Energy (2nd Company)';
+ALTER TABLE company_config ADD COLUMN IF NOT EXISTS bank2_name TEXT DEFAULT 'ICICI BANK LIMITED';
+ALTER TABLE company_config ADD COLUMN IF NOT EXISTS bank2_account_name TEXT DEFAULT 'Kehansri  Energy (OPC) Solutions';
+ALTER TABLE company_config ADD COLUMN IF NOT EXISTS bank2_account_number TEXT DEFAULT '038205006367';
+ALTER TABLE company_config ADD COLUMN IF NOT EXISTS bank2_ifsc_code TEXT DEFAULT 'ICIC0000382';
+ALTER TABLE company_config ADD COLUMN IF NOT EXISTS bank2_branch_address TEXT DEFAULT 'BANJARA  HILLS';
 
 -- 3. USERS TABLE (Sales Staff & Admin Accounts)
 CREATE TABLE IF NOT EXISTS users (
@@ -86,16 +86,32 @@ CREATE TABLE IF NOT EXISTS users (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::TEXT, NOW())
 );
 
--- 4. SEED INITIAL CONFIG & DEFAULT USERS (If Empty)
+-- 4. SEED INITIAL CONFIG & DEFAULT USERS (If Empty or Update Existing)
 INSERT INTO company_config (
   id, bank_label, bank_name, account_name, account_number, ifsc_code, branch_address,
   bank2_label, bank2_name, bank2_account_name, bank2_account_number, bank2_ifsc_code, bank2_branch_address,
   company_name, company_email, company_phone, company_address
 ) VALUES (
   1, 'KehanSri Solar (Primary)', 'ICICI BANK', 'KehanSri Solar', '38205006367', 'ICIC0000382', 'Banjara Hills, Road No 12, Hyderabad: 500034',
-  'K Energy Solutions (2nd Company)', 'HDFC BANK LTD', 'K Energy Solutions', '50200088991122', 'HDFC0000456', 'Gachibowli Main Branch, Hyderabad: 500032',
+  'Kehansri Energy (2nd Company)', 'ICICI BANK LIMITED', 'Kehansri  Energy (OPC) Solutions', '038205006367', 'ICIC0000382', 'BANJARA  HILLS',
   'KehanSri Solar', 'sales@kehansrisolar.com', '+91 9493858086', 'Street- 19, Sri Shyam Nagar, Telecom Nagar, Gachibowli, Hyderabad, Telangana: 500081'
-) ON CONFLICT (id) DO NOTHING;
+) ON CONFLICT (id) DO UPDATE SET
+  bank_label = EXCLUDED.bank_label,
+  bank_name = EXCLUDED.bank_name,
+  account_name = EXCLUDED.account_name,
+  account_number = EXCLUDED.account_number,
+  ifsc_code = EXCLUDED.ifsc_code,
+  branch_address = EXCLUDED.branch_address,
+  bank2_label = EXCLUDED.bank2_label,
+  bank2_name = EXCLUDED.bank2_name,
+  bank2_account_name = EXCLUDED.bank2_account_name,
+  bank2_account_number = EXCLUDED.bank2_account_number,
+  bank2_ifsc_code = EXCLUDED.bank2_ifsc_code,
+  bank2_branch_address = EXCLUDED.bank2_branch_address,
+  company_name = EXCLUDED.company_name,
+  company_email = EXCLUDED.company_email,
+  company_phone = EXCLUDED.company_phone,
+  company_address = EXCLUDED.company_address;
 
 -- Seed Default Admin & Sales users (kehansri888 & sales888)
 INSERT INTO users (id, username, display_name, password_hash, role, phone, email, is_active)

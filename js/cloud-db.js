@@ -200,12 +200,12 @@ class CloudDatabaseEngine {
         ifsc_code: "ICIC0000382",
         branch_address: "Banjara Hills, Road No 12, Hyderabad: 500034",
 
-        bank2_label: "K Energy Solutions (2nd Company)",
-        bank2_name: "HDFC BANK LTD",
-        bank2_account_name: "K Energy Solutions",
-        bank2_account_number: "50200088991122",
-        bank2_ifsc_code: "HDFC0000456",
-        bank2_branch_address: "Gachibowli Main Branch, Hyderabad: 500032",
+        bank2_label: "Kehansri Energy (2nd Company)",
+        bank2_name: "ICICI BANK LIMITED",
+        bank2_account_name: "Kehansri  Energy (OPC) Solutions",
+        bank2_account_number: "038205006367",
+        bank2_ifsc_code: "ICIC0000382",
+        bank2_branch_address: "BANJARA  HILLS",
 
         company_name: "KehanSri Solar",
         company_email: "sales@kehansrisolar.com",
