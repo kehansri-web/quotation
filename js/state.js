@@ -65,7 +65,7 @@ class AppStateManager {
       this.currentQuote.business.website = "www.kehansrisolar.com";
     }
     if (!this.currentQuote.business.address) {
-      this.currentQuote.business.address = "Plot 42, Silicon Valley, Hyderabad, Telangana: 500081";
+      this.currentQuote.business.address = "Street- 19, Sri Shyam Nagar, Telecom Nagar, Gachibowli, Hyderabad, Telangana: 500081";
     }
     if (!this.currentQuote.solar.customerType) {
       this.currentQuote.solar.customerType = "residential";

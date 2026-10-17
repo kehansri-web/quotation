@@ -218,7 +218,7 @@ class SolarProposalRenderer {
             </div>
             <div class="meta-field-row">
               <span class="meta-field-label">Address:</span>
-              <span class="meta-field-val">${this.escape(b.address || "Plot No 2-55, Sri Shyam Nagar, Telecom Nagar, Gachibowli, Hyderabad, District-Ranga Reddy, PIN: 500032").replace(/\n/g, "<br>")}</span>
+              <span class="meta-field-val">${this.escape(b.address || "Street- 19, Sri Shyam Nagar, Telecom Nagar, Gachibowli, Hyderabad, Telangana: 500081").replace(/\n/g, "<br>")}</span>
             </div>
             <div class="meta-field-row" style="margin-top: 8px;">
               <span class="meta-field-label">Email:</span>

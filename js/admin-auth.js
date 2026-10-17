@@ -16,15 +16,15 @@
 
 class AdminAuthManager {
   constructor() {
-    this.token = sessionStorage.getItem("quotecraft_auth_token") || 
-                 localStorage.getItem("quotecraft_auth_token") || 
-                 sessionStorage.getItem("quotecraft_admin_token") || null;
-    this.role = sessionStorage.getItem("quotecraft_auth_role") || 
-                localStorage.getItem("quotecraft_auth_role") || null;
-    this.username = sessionStorage.getItem("quotecraft_auth_user") || 
-                    localStorage.getItem("quotecraft_auth_user") || null;
-    this.displayName = sessionStorage.getItem("quotecraft_auth_display") || 
-                       localStorage.getItem("quotecraft_auth_display") || null;
+    this.token = sessionStorage.getItem("quotecraft_auth_token") ||
+      localStorage.getItem("quotecraft_auth_token") ||
+      sessionStorage.getItem("quotecraft_admin_token") || null;
+    this.role = sessionStorage.getItem("quotecraft_auth_role") ||
+      localStorage.getItem("quotecraft_auth_role") || null;
+    this.username = sessionStorage.getItem("quotecraft_auth_user") ||
+      localStorage.getItem("quotecraft_auth_user") || null;
+    this.displayName = sessionStorage.getItem("quotecraft_auth_display") ||
+      localStorage.getItem("quotecraft_auth_display") || null;
 
     this.companyConfig = null;
     this.quoteFilters = {
@@ -96,7 +96,7 @@ class AdminAuthManager {
           return data.config;
         }
       }
-    } catch (e) {}
+    } catch (e) { }
 
     // Default Master Config
     const fallbackConfig = {
@@ -156,17 +156,51 @@ class AdminAuthManager {
         bank2
       });
 
-      if (cfg.company_name && !state.getQuote().business?.name) {
-        state.updateBusiness({
-          name: cfg.company_name,
-          email: cfg.company_email || "sales@kehansrisolar.com",
-          phone: cfg.company_phone || "+91 9493858086",
-          address: cfg.company_address || "Plot 42, Silicon Valley, Hyderabad, Telangana: 500081"
-        });
+      const compAddr = cfg.company_address || cfg.companyAddress;
+      const compName = cfg.company_name || cfg.companyName;
+      const compEmail = cfg.company_email || cfg.companyEmail;
+      const compPhone = cfg.company_phone || cfg.companyPhone;
+
+      const bizUpdates = {};
+      if (compAddr) bizUpdates.address = compAddr;
+      if (compName) bizUpdates.name = compName;
+      if (compEmail) bizUpdates.email = compEmail;
+      if (compPhone) bizUpdates.phone = compPhone;
+
+      if (Object.keys(bizUpdates).length > 0) {
+        state.updateBusiness(bizUpdates);
+      }
+
+      // Keep SAMPLE_QUOTATION in sync so subsequent resets or clean quotations preserve master config
+      if (typeof SAMPLE_QUOTATION !== "undefined" && SAMPLE_QUOTATION.business) {
+        if (compAddr) SAMPLE_QUOTATION.business.address = compAddr;
+        if (compName) SAMPLE_QUOTATION.business.name = compName;
+        if (compEmail) SAMPLE_QUOTATION.business.email = compEmail;
+        if (compPhone) SAMPLE_QUOTATION.business.phone = compPhone;
+        SAMPLE_QUOTATION.paymentDetails = {
+          bankName: activeBank.bankName,
+          accountName: activeBank.accountName,
+          accountNumber: activeBank.accountNumber,
+          routingOrIfsc: activeBank.routingOrIfsc,
+          notes: activeBank.notes,
+          bank1,
+          bank2,
+          selectedBank: selectedBankChoice
+        };
       }
     }
 
     this.updateBankChoiceLabels(bank1, bank2);
+
+    // Refresh active form fields and live preview
+    if (window.quoteApp) {
+      if (typeof window.quoteApp.renderFormFromState === "function") {
+        window.quoteApp.renderFormFromState();
+      }
+      if (typeof window.quoteApp.renderLivePreview === "function") {
+        window.quoteApp.renderLivePreview();
+      }
+    }
   }
 
   updateBankChoiceLabels(bank1, bank2) {
@@ -223,7 +257,7 @@ class AdminAuthManager {
           return true;
         }
       }
-    } catch (e) {}
+    } catch (e) { }
 
     // Invalid session
     this.logout(false);
@@ -482,6 +516,26 @@ class AdminAuthManager {
       }
     }
 
+    const btnSaveBankQuick = document.getElementById("btn-save-bank-quick");
+    const btnSaveAddrQuick = document.getElementById("btn-save-addr-quick");
+    const btnAuthToggle = document.getElementById("btn-admin-auth-toggle");
+
+    if (btnSaveBankQuick) {
+      btnSaveBankQuick.style.display = this.isAdmin ? "inline-flex" : "none";
+    }
+    if (btnSaveAddrQuick) {
+      btnSaveAddrQuick.style.display = this.isAdmin ? "inline-flex" : "none";
+    }
+    if (btnAuthToggle) {
+      if (this.isAdmin) {
+        btnAuthToggle.innerHTML = "<span>⚙️ Master Config</span>";
+        btnAuthToggle.title = "Open Master Bank & Company Configuration";
+      } else {
+        btnAuthToggle.innerHTML = "<span>🔒 Unlock (Admin)</span>";
+        btnAuthToggle.title = "Log in as Administrator to edit bank details";
+      }
+    }
+
     const headerAdminBtn = document.getElementById("btn-header-admin") || document.getElementById("btn-open-admin");
     if (headerAdminBtn) {
       if (this.isAdmin) {
@@ -580,13 +634,13 @@ class AdminAuthManager {
         const data = await resp.json();
         users = data.salespersons || [];
       }
-    } catch (e) {}
+    } catch (e) { }
 
     const currentQuote = (typeof state !== "undefined") ? state.getQuote() : null;
     const currentSalesUsername = currentQuote?.business?.salesUsername || currentQuote?.sales_username || this.username || "ADMIN";
 
     let html = `<option value="ADMIN" ${currentSalesUsername === "ADMIN" ? "selected" : ""}>👑 Administrator (Self / ADMIN)</option>`;
-    
+
     users.forEach(u => {
       if (u.username.toUpperCase() !== "ADMIN") {
         const isSel = (currentSalesUsername.toLowerCase() === u.username.toLowerCase()) ? "selected" : "";
@@ -600,7 +654,7 @@ class AdminAuthManager {
     select.onchange = (e) => {
       const chosenUsername = e.target.value;
       const targetUser = users.find(u => u.username.toLowerCase() === chosenUsername.toLowerCase());
-      
+
       let assignedDisplayName = "Administrator";
       if (chosenUsername === "ADMIN") {
         assignedDisplayName = this.displayName || "Administrator";
@@ -685,6 +739,29 @@ class AdminAuthManager {
     const tabAdmin = document.getElementById("gate-tab-admin");
     if (tabSales) tabSales.addEventListener("click", () => this.setGateRoleTab("sales"));
     if (tabAdmin) tabAdmin.addEventListener("click", () => this.setGateRoleTab("admin"));
+
+    // Bank & Address Quick Save Buttons for Admin
+    const btnSaveBankQuick = document.getElementById("btn-save-bank-quick");
+    if (btnSaveBankQuick) {
+      btnSaveBankQuick.addEventListener("click", () => this.saveCurrentBankAsMaster());
+    }
+
+    const btnSaveAddrQuick = document.getElementById("btn-save-addr-quick");
+    if (btnSaveAddrQuick) {
+      btnSaveAddrQuick.addEventListener("click", () => this.saveAddressAsMaster());
+    }
+
+    // Proposal Workspace Bank Unlock / Master Config Button
+    const btnAuthToggle = document.getElementById("btn-admin-auth-toggle");
+    if (btnAuthToggle) {
+      btnAuthToggle.addEventListener("click", () => {
+        if (this.isAdmin) {
+          this.openAdminDashboard("config");
+        } else {
+          this.openLoginModal("admin");
+        }
+      });
+    }
 
     // Header Admin/User Button
     const headerAdminBtn = document.getElementById("btn-header-admin") || document.getElementById("btn-open-admin");
@@ -961,7 +1038,7 @@ create policy "Allow all access to users" on users for all using (true) with che
       if (hintBox) {
         hintBox.innerHTML = `
           <div><strong>Sales Representative Sign In:</strong></div>
-          <div style="margin-top: 2px;">Enter sales username &amp; password (Default: <code>SALES</code> / <code>sales888</code>).</div>
+          <div style="margin-top: 2px;">Please enter your authorized username and password to open the quotation workspace.</div>
         `;
       }
     } else {
@@ -970,7 +1047,7 @@ create policy "Allow all access to users" on users for all using (true) with che
       if (hintBox) {
         hintBox.innerHTML = `
           <div><strong>Administrator Sign In:</strong></div>
-          <div style="margin-top: 2px;">Enter administrator credentials (Default: <code>ADMIN</code> / <code>kehansri888</code>).</div>
+          <div style="margin-top: 2px;">Please enter administrator credentials to unlock master settings.</div>
         `;
       }
     }
@@ -1045,10 +1122,28 @@ create policy "Allow all access to users" on users for all using (true) with che
     if (modal) modal.classList.remove("active");
   }
 
-  async openAdminDashboard() {
+  async openAdminDashboard(targetTab = null) {
     const modal = document.getElementById("modal-admin-dashboard");
     if (!modal) return;
     modal.classList.add("active");
+
+    if (targetTab) {
+      const tabTargetId = targetTab.startsWith("admin-tab-") ? targetTab : `admin-tab-${targetTab}`;
+      document.querySelectorAll(".admin-tab-btn").forEach(b => {
+        if (b.dataset.target === tabTargetId) {
+          b.classList.add("active");
+        } else {
+          b.classList.remove("active");
+        }
+      });
+      document.querySelectorAll(".admin-tab-pane").forEach(p => {
+        if (p.id === tabTargetId) {
+          p.classList.add("active");
+        } else {
+          p.classList.remove("active");
+        }
+      });
+    }
 
     try {
       this.populateMasterConfigForm();
@@ -1062,7 +1157,7 @@ create policy "Allow all access to users" on users for all using (true) with che
       if (window.cloudDb) {
         await window.cloudDb.syncAllLocalQuotesToCloud();
       }
-    } catch (e) {}
+    } catch (e) { }
 
     try {
       await this.fetchMasterSalesReps();
@@ -1219,9 +1314,10 @@ create policy "Allow all access to users" on users for all using (true) with che
         const res = await window.cloudDb.saveCompanyConfig(payload, this.token);
         this.companyConfig = res.config || payload;
         this.applyConfigToState(this.companyConfig);
+        this.populateMasterConfigForm();
         if (window.quoteApp) {
           window.quoteApp.renderFormFromState();
-          window.quoteApp.showToast("Master Bank 1 & Bank 2 Configuration Saved!", "success");
+          window.quoteApp.showToast(res.message || "Master Bank & Company Configuration Saved!", "success");
         }
       }
     } catch (e) {
@@ -1232,6 +1328,86 @@ create policy "Allow all access to users" on users for all using (true) with che
         btn.disabled = false;
         btn.innerHTML = `<span>💾 Save Master Bank (1 &amp; 2) &amp; Company Configuration</span>`;
       }
+    }
+  }
+
+  async saveAddressAsMaster() {
+    if (!this.isAdmin) {
+      this.openLoginModal("admin");
+      return;
+    }
+    const addr = (document.getElementById("inp-biz-address")?.value || "").trim();
+    if (!addr) {
+      if (window.quoteApp) window.quoteApp.showToast("Address cannot be empty", "warning");
+      return;
+    }
+    const currentCfg = this.companyConfig || {};
+    const payload = {
+      ...currentCfg,
+      companyAddress: addr,
+      company_address: addr
+    };
+    const btn = document.getElementById("btn-save-addr-quick");
+    if (btn) btn.innerHTML = "⏳ Saving...";
+    try {
+      if (window.cloudDb) {
+        const res = await window.cloudDb.saveCompanyConfig(payload, this.token);
+        this.companyConfig = res.config || payload;
+        this.applyConfigToState(this.companyConfig);
+        if (window.quoteApp) window.quoteApp.showToast("Office Address saved permanently to Backend & Cloud Database!", "success");
+      }
+    } catch (e) {
+      console.error(e);
+      if (window.quoteApp) window.quoteApp.showToast("Failed to save address to backend", "error");
+    } finally {
+      if (btn) btn.innerHTML = "💾 Save as Master Address";
+    }
+  }
+
+  async saveCurrentBankAsMaster() {
+    if (!this.isAdmin) {
+      this.openLoginModal("admin");
+      return;
+    }
+    const bankName = (document.getElementById("inp-bank-name")?.value || "").trim();
+    const accName = (document.getElementById("inp-acc-name")?.value || "").trim();
+    const accNumber = (document.getElementById("inp-acc-number")?.value || "").trim();
+    const ifsc = (document.getElementById("inp-bank-ifsc")?.value || "").trim();
+    const branchAddr = (document.getElementById("inp-payment-notes")?.value || "").trim();
+
+    const currentCfg = this.companyConfig || {};
+    const curPayment = (typeof state !== "undefined" ? state.getQuote().paymentDetails : {}) || {};
+    const isBank2 = curPayment.selectedBank === "bank2";
+
+    const payload = { ...currentCfg };
+    if (isBank2) {
+      payload.bank2Name = bankName;
+      payload.bank2AccountName = accName;
+      payload.bank2AccountNumber = accNumber;
+      payload.bank2RoutingOrIfsc = ifsc;
+      payload.bank2BranchAddress = branchAddr;
+    } else {
+      payload.bankName = bankName;
+      payload.accountName = accName;
+      payload.accountNumber = accNumber;
+      payload.routingOrIfsc = ifsc;
+      payload.branchAddress = branchAddr;
+    }
+
+    const btn = document.getElementById("btn-save-bank-quick");
+    if (btn) btn.innerHTML = "<span>⏳ Saving...</span>";
+    try {
+      if (window.cloudDb) {
+        const res = await window.cloudDb.saveCompanyConfig(payload, this.token);
+        this.companyConfig = res.config || payload;
+        this.applyConfigToState(this.companyConfig);
+        if (window.quoteApp) window.quoteApp.showToast("Bank details saved permanently to Backend & Cloud Database!", "success");
+      }
+    } catch (e) {
+      console.error(e);
+      if (window.quoteApp) window.quoteApp.showToast("Failed to save bank details to backend", "error");
+    } finally {
+      if (btn) btn.innerHTML = "<span>💾 Save to Master</span>";
     }
   }
 
@@ -1263,7 +1439,7 @@ create policy "Allow all access to users" on users for all using (true) with che
     const users = this.registeredUsersList || [];
 
     let html = `<option value="all" ${currentSelected === "all" ? "selected" : ""}>👥 All Sales Accounts (${users.length})</option>`;
-    
+
     users.forEach(u => {
       const username = u.username || "";
       const displayName = u.display_name || username;
@@ -1522,7 +1698,7 @@ create policy "Allow all access to users" on users for all using (true) with che
     this.cachedQuotesList.forEach(q => {
       const isJson = typeof q.quote_json === "string";
       let parsed = null;
-      try { parsed = isJson ? JSON.parse(q.quote_json) : q.quote_json; } catch(e) {}
+      try { parsed = isJson ? JSON.parse(q.quote_json) : q.quote_json; } catch (e) { }
 
       const kw = Number(q.kw_capacity || parsed?.solar?.kwCapacity || 0);
       const cost = Number(q.total_cost || parsed?.solar?.customSystemCost || 0);
@@ -1608,7 +1784,7 @@ create policy "Allow all access to users" on users for all using (true) with che
       group.items.forEach(q => {
         const isJson = typeof q.quote_json === "string";
         let parsed = null;
-        try { parsed = isJson ? JSON.parse(q.quote_json) : q.quote_json; } catch(e) {}
+        try { parsed = isJson ? JSON.parse(q.quote_json) : q.quote_json; } catch (e) { }
 
         const clientName = q.client_name || parsed?.client?.name || "Customer";
         const quoteNum = q.quote_number || q.id;
@@ -1705,7 +1881,7 @@ create policy "Allow all access to users" on users for all using (true) with che
 
         quotes.forEach(q => {
           let parsed = null;
-          try { parsed = typeof q.quote_json === 'string' ? JSON.parse(q.quote_json) : q.quote_json; } catch(e) {}
+          try { parsed = typeof q.quote_json === 'string' ? JSON.parse(q.quote_json) : q.quote_json; } catch (e) { }
           const cType = q.customer_type || parsed?.solar?.customerType || 'residential';
           const kw = parseFloat(q.kw_capacity || parsed?.solar?.kwCapacity || 0) || 0;
           const cost = parseFloat(q.total_cost || parsed?.solar?.customSystemCost || 0) || 0;
@@ -1770,7 +1946,7 @@ create policy "Allow all access to users" on users for all using (true) with che
         const ledgerRows = [ledgerHeaders];
         quotes.forEach(q => {
           let parsed = null;
-          try { parsed = typeof q.quote_json === 'string' ? JSON.parse(q.quote_json) : q.quote_json; } catch(e) {}
+          try { parsed = typeof q.quote_json === 'string' ? JSON.parse(q.quote_json) : q.quote_json; } catch (e) { }
           const rawTimestamp = q.created_at || q.createdAt || parsed?.createdAt || "";
           const dateVal = this.formatDateDisplay(rawTimestamp);
           const timeVal = this.formatTimeDisplay(rawTimestamp);
@@ -1814,7 +1990,7 @@ create policy "Allow all access to users" on users for all using (true) with che
         const repsData = {};
         quotes.forEach(q => {
           let parsed = null;
-          try { parsed = typeof q.quote_json === 'string' ? JSON.parse(q.quote_json) : q.quote_json; } catch(e) {}
+          try { parsed = typeof q.quote_json === 'string' ? JSON.parse(q.quote_json) : q.quote_json; } catch (e) { }
           const repName = q.sales_rep || parsed?.business?.preparedByName || "Direct / Admin";
           const repUser = q.sales_username || parsed?.business?.salesUsername || "SALES";
           const kw = parseFloat(q.kw_capacity || parsed?.solar?.kwCapacity || 0) || 0;
@@ -1923,7 +2099,7 @@ create policy "Allow all access to users" on users for all using (true) with che
     quotes.forEach(q => {
       const isJson = typeof q.quote_json === "string";
       let parsed = null;
-      try { parsed = isJson ? JSON.parse(q.quote_json) : q.quote_json; } catch(e) {}
+      try { parsed = isJson ? JSON.parse(q.quote_json) : q.quote_json; } catch (e) { }
 
       const rawTimestamp = q.created_at || q.createdAt || parsed?.createdAt || "";
       const dateVal = this.formatDateDisplay(rawTimestamp);
@@ -2037,7 +2213,7 @@ create policy "Allow all access to users" on users for all using (true) with che
     quotes.forEach(q => {
       const isJson = typeof q.quote_json === "string";
       let parsed = null;
-      try { parsed = isJson ? JSON.parse(q.quote_json) : q.quote_json; } catch(e) {}
+      try { parsed = isJson ? JSON.parse(q.quote_json) : q.quote_json; } catch (e) { }
 
       const kw = Number(q.kw_capacity || parsed?.solar?.kwCapacity || 0);
       const cost = Number(q.total_cost || parsed?.solar?.customSystemCost || 0);
@@ -2233,8 +2409,8 @@ create policy "Allow all access to users" on users for all using (true) with che
         </div>
 
         ${sortedDayKeys.map(dayKey => {
-          const group = dayGroups[dayKey];
-          return `
+      const group = dayGroups[dayKey];
+      return `
             <div class="day-group">
               <div class="day-header">
                 <span>📅 ${group.displayDate} &mdash; ${group.count} Quotation(s)</span>
@@ -2271,7 +2447,7 @@ create policy "Allow all access to users" on users for all using (true) with che
               </table>
             </div>
           `;
-        }).join("")}
+    }).join("")}
 
         <div class="print-footer">
           <span>QuoteCraft Pro &copy; ${new Date().getFullYear()} ${this.escape(companyName)}</span>
@@ -2333,7 +2509,7 @@ create policy "Allow all access to users" on users for all using (true) with che
       const roleBadge = isMasterAdmin
         ? `<span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #10b981; font-weight:700;">🛡️ Administrator</span>`
         : `<span class="badge" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; font-weight:700;">👤 Sales Staff</span>`;
-      
+
       const createdStr = u.created_at ? new Date(u.created_at).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "Active";
       const phoneDisplay = u.phone || "—";
       const emailDisplay = u.email || "—";

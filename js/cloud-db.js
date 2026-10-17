@@ -161,6 +161,7 @@ class CloudDatabaseEngine {
         if (resp.ok) {
           const rows = await resp.json();
           if (Array.isArray(rows) && rows.length > 0) {
+            localStorage.setItem("quotecraft_master_config", JSON.stringify(rows[0]));
             return { success: true, config: rows[0] };
           }
         }
@@ -175,6 +176,7 @@ class CloudDatabaseEngine {
       if (resp.ok) {
         const data = await resp.json();
         if (data.success && data.config) {
+          localStorage.setItem("quotecraft_master_config", JSON.stringify(data.config));
           return { success: true, config: data.config };
         }
       }
@@ -208,19 +210,21 @@ class CloudDatabaseEngine {
         company_name: "KehanSri Solar",
         company_email: "sales@kehansrisolar.com",
         company_phone: "+91 9493858086",
-        company_address: "Plot 42, Silicon Valley, Hyderabad, Telangana: 500081"
+        company_address: "Street- 19, Sri Shyam Nagar, Telecom Nagar, Gachibowli, Hyderabad, Telangana: 500081"
       }
     };
   }
 
-  /**
-   * Saves master company & bank details (Admin Only)
-   */
   async saveCompanyConfig(configData, token = null) {
-    // Save to local storage cache immediately
-    localStorage.setItem("quotecraft_master_config", JSON.stringify(configData));
+    const activeToken = token || (window.adminAuth ? window.adminAuth.token : null) || 
+                        sessionStorage.getItem("quotecraft_auth_token") || 
+                        localStorage.getItem("quotecraft_auth_token");
 
-    // 1. Try Supabase Cloud Database
+    let savedCloud = false;
+    let savedLocalBackend = false;
+    let savedConfig = { ...configData };
+
+    // 1. Save to Supabase Cloud Database if configured
     if (this.isCloudConfigured()) {
       try {
         const payload = {
@@ -250,35 +254,53 @@ class CloudDatabaseEngine {
           method: "PATCH",
           headers: {
             ...this.getSupabaseHeaders(),
-            "Prefer": "resolution=merge-duplicates"
+            "Prefer": "return=representation,resolution=merge-duplicates"
           },
           body: JSON.stringify(payload)
         });
 
         if (resp.ok) {
-          return { success: true, message: "Saved to Cloud Database & Local Storage", config: payload };
+          savedCloud = true;
+          savedConfig = { ...savedConfig, ...payload };
         }
       } catch (e) {
         console.warn("Cloud DB save error:", e);
       }
     }
 
-    // 2. Try Python Backend Server
+    // 2. Also save to Python Backend Server (http://localhost:8899)
     try {
       const resp = await fetch(this.getApiBase() + "/api/admin/config", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": token ? `Bearer ${token}` : ""
+          "Authorization": activeToken ? `Bearer ${activeToken}` : ""
         },
         body: JSON.stringify(configData)
       });
       if (resp.ok) {
-        return await resp.json();
+        const data = await resp.json();
+        if (data && data.success) {
+          savedLocalBackend = true;
+          if (data.config) savedConfig = { ...savedConfig, ...data.config };
+        }
       }
-    } catch (e) {}
+    } catch (e) {
+      console.warn("Local backend save error:", e);
+    }
 
-    return { success: true, message: "Saved locally (Offline Mode)", config: configData };
+    // Cache to localStorage
+    localStorage.setItem("quotecraft_master_config", JSON.stringify(savedConfig));
+
+    if (savedCloud && savedLocalBackend) {
+      return { success: true, message: "Saved to Supabase Cloud & Local Backend Database!", config: savedConfig };
+    } else if (savedCloud) {
+      return { success: true, message: "Saved to Supabase Cloud Database!", config: savedConfig };
+    } else if (savedLocalBackend) {
+      return { success: true, message: "Saved to Local Backend Database!", config: savedConfig };
+    }
+
+    return { success: true, message: "Saved locally (Offline Mode)", config: savedConfig };
   }
 
   /**

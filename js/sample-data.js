@@ -57,7 +57,7 @@ const SAMPLE_QUOTATION = {
     phone: "+91 9493858086",
     website: "www.kehansrisolar.com",
     taxId: "",
-    address: "Plot 42, Silicon Valley, Hyderabad, Telangana: 500081",
+    address: "Street- 19, Sri Shyam Nagar, Telecom Nagar, Gachibowli, Hyderabad, Telangana: 500081",
     logoUrl: "assets/kehansri-solar-logo.png"
   },
 

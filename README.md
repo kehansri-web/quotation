@@ -165,7 +165,7 @@ QuoteCraft Pro automatically generates a multi-sheet Excel spreadsheet (`.xlsx`)
 | `REPORT_RECIPIENT_EMAIL` | `youremail@gmail.com` | Recipient email(s) for daily reports (comma-separated for multiple) |
 | `SMTP_USER` | `sender@gmail.com` | Your Gmail address or SMTP email account |
 | `SMTP_PASS` | `abcd efgh ijkl mnop` | Gmail 16-character App Password (or SMTP Password) |
-| `SUPABASE_URL` | `https://xxxx.supabase.co` | Supabase Cloud Database URL |
+| `SUPABASE_URL` | `https://bvxyzsmveauqcpbnfgdt.supabase.co` | Supabase Cloud Database URL |
 | `SUPABASE_KEY` | `eyJhbGciOi...` | Supabase Service / Anon API Key |
 
 3. The report will trigger automatically every day at **08:00 PM IST**. You can also run it on demand anytime under the **Actions** tab by clicking **Run workflow**!

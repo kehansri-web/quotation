@@ -94,7 +94,7 @@ INSERT INTO company_config (
 ) VALUES (
   1, 'KehanSri Solar (Primary)', 'ICICI BANK', 'KehanSri Solar', '38205006367', 'ICIC0000382', 'Banjara Hills, Road No 12, Hyderabad: 500034',
   'K Energy Solutions (2nd Company)', 'HDFC BANK LTD', 'K Energy Solutions', '50200088991122', 'HDFC0000456', 'Gachibowli Main Branch, Hyderabad: 500032',
-  'KehanSri Solar', 'sales@kehansrisolar.com', '+91 9493858086', 'Plot 42, Silicon Valley, Hyderabad, Telangana: 500081'
+  'KehanSri Solar', 'sales@kehansrisolar.com', '+91 9493858086', 'Street- 19, Sri Shyam Nagar, Telecom Nagar, Gachibowli, Hyderabad, Telangana: 500081'
 ) ON CONFLICT (id) DO NOTHING;
 
 -- Seed Default Admin & Sales users (kehansri888 & sales888)

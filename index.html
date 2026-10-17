@@ -926,8 +926,13 @@
           </div>
 
           <div class="form-group">
-            <label class="form-label" for="inp-biz-address">Registered Office Address</label>
-            <textarea id="inp-biz-address" class="form-control" rows="2">Plot No 2-55, Sri Shyam Nagar, Telecom Nagar, Gachibowli, Hyderabad, District-Ranga Reddy, PIN: 500032</textarea>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <label class="form-label" for="inp-biz-address" style="margin-bottom: 0;">Registered Office Address</label>
+              <button type="button" id="btn-save-addr-quick" class="btn btn-secondary" style="display: none; font-size: 0.7rem; padding: 2px 8px; height: 22px; color: #10b981; border-color: rgba(16, 185, 129, 0.3);" title="Save this address permanently to Backend & Cloud Database">
+                💾 Save as Master Address
+              </button>
+            </div>
+            <textarea id="inp-biz-address" class="form-control" rows="2">Street- 19, Sri Shyam Nagar, Telecom Nagar, Gachibowli, Hyderabad, Telangana: 500081</textarea>
           </div>
         </div>
       </div>
@@ -940,6 +945,9 @@
             <span>Payment & Bank Details</span>
           </div>
           <div style="display: flex; align-items: center; gap: 8px;">
+            <button type="button" id="btn-save-bank-quick" class="btn btn-primary" style="display: none; font-size: 0.72rem; padding: 3px 10px; height: 25px; background: #10b981; color: white;" title="Save these bank details permanently to Backend & Cloud Database">
+              <span>💾 Save to Master</span>
+            </button>
             <button type="button" id="btn-admin-auth-toggle" class="btn btn-secondary" style="font-size: 0.72rem; padding: 3px 8px; height: 25px; color: #10b981; border-color: rgba(16, 185, 129, 0.3);">
               <span>🔒 Unlock (Admin)</span>
             </button>
@@ -1793,7 +1801,7 @@ create table if not exists company_config (
   company_name text not null default 'KehanSri Solar',
   company_email text default 'sales@kehansrisolar.com',
   company_phone text default '+91 9493858086',
-  company_address text default 'Plot 42, Silicon Valley, Hyderabad, Telangana: 500081',
+  company_address text default 'Street- 19, Sri Shyam Nagar, Telecom Nagar, Gachibowli, Hyderabad, Telangana: 500081',
   sales_username text default 'SALES',
   updated_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
